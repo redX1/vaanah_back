@@ -37,18 +37,7 @@ class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
-
-    @swagger_auto_schema(
-        operation_description="apiview post description override",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['username'],
-            properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING)
-            },
-        ),
-        security=[]
-    )
+    
     def post(self, request):
         user = request.data.get('user', {})
 

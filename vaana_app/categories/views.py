@@ -10,10 +10,11 @@ from rest_framework.views import APIView
 
 from .serializers import CategorySerializer
 from .models import Category
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import permission_classes
 
 
 class CategoryAPIView(APIView):
-    permission_classes = (AllowAny,)
     serializer_class = CategorySerializer
     
     def get(self, request):
@@ -21,18 +22,20 @@ class CategoryAPIView(APIView):
         serializer = CategorySerializer(categories, many=True)
         return JsonResponse({'categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
         
-
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        print(user)
+        print(request.user.id)
+        
         try:
             category = Category.objects.create(
                 id=payload["id"],
                 name=payload["name"],
                 slug=payload["slug"],
                 description=payload["description"],
-                created_by=user,
+                created_by=user
                 # products=payload["products"].set()
             )
             serializer = CategorySerializer(category)

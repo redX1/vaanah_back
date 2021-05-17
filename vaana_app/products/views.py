@@ -17,7 +17,6 @@ from .serializers import ProductSerializer
 
 
 class ProductAPIView(APIView):
-    permission_classes = (AllowAny,IsAuthenticated)
     serializer_class = ProductSerializer
 
     def get(self, request):
@@ -25,7 +24,8 @@ class ProductAPIView(APIView):
         serializer = ProductSerializer(products, many=True)
         return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
-    
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
@@ -49,7 +49,7 @@ class UpdateProductAPIView(APIView):
     permission_classes = (AllowAny,IsAuthenticated)
     serializer_class = ProductSerializer
 
-    def update(self, request, product_id):
+    def put(self, request, product_id):
         user = request.user.id
         payload = json.loads(request.body)
         try:

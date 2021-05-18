@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -89,7 +90,7 @@ DATABASES = {
         'NAME': 'vaanahdb',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': 'localhost',
+        'HOST': '192.168.1.24',
         'PORT': '5433',
     }
 }
@@ -143,3 +144,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # the `authentication` module. This module is registered above in a setting
 # called `INSTALLED_APPS`.
 AUTH_USER_MODEL = 'users.User'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

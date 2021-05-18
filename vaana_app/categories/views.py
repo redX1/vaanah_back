@@ -1,3 +1,4 @@
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import JsonResponse
 from rest_framework.response import Response
@@ -18,7 +19,7 @@ class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
     def get(self, request):
-        categories = Category.objects.all()
+        categories = Category.objects.filter(is_active=True)
         serializer = CategorySerializer(categories, many=True)
         return JsonResponse({'categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
         
@@ -27,13 +28,13 @@ class CategoryAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        print(request.user.id)
         
         try:
             category = Category.objects.create(
                 id=payload["id"],
                 name=payload["name"],
                 slug=payload["slug"],
+                is_active= payload["is_active"],
                 description=payload["description"],
                 created_by=user
                 # products=payload["products"].set()
@@ -43,10 +44,15 @@ class CategoryAPIView(APIView):
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
-class UpdateCategoryAPIView(APIView):
-    permission_classes = (AllowAny, IsAuthenticated)
+class RetrieveDeleteUpdateCategoryAPIView(RetrieveUpdateAPIView):
     serializer_class = CategorySerializer
 
+    def get(self, request, category_id):
+        category = Category.objects.get(id=category_id)
+        serializer = CategorySerializer(category)
+        return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+    @permission_classes([IsAuthenticated])
     def put(self, request, category_id):
         user = request.user.id
         payload = json.loads(request.body)
@@ -60,10 +66,7 @@ class UpdateCategoryAPIView(APIView):
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
-class DeleteCategoryAPIView(APIView):
-    permission_classes = (AllowAny, IsAuthenticated)
-    serializer_class = CategorySerializer
-    
+    @permission_classes([IsAuthenticated])
     def delete(self, request, category_id):
         user = request.user.id
         try:

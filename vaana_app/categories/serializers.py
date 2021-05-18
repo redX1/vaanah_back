@@ -11,6 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
+            "is_active",
             "created_by",
             "products",
         ]

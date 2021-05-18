@@ -7,6 +7,7 @@ class Category(models.Model):
     description = models.TextField() 
     slug        = models.SlugField()
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
 
 
     class Meta:

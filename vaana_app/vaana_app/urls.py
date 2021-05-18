@@ -39,8 +39,10 @@ urlpatterns = [
     path('api/', include('users.urls'), name='users'),
     path('swagger-ui', schema_view.with_ui('swagger', cache_timeout=0)),
 
-    path('categories/', include('categories.urls'), name='categories'),
+    path('api/', include('categories.urls'), name='categories'),
 
-    path('products/', include('products.urls'), name='products')
+    path('api/', include('products.urls'), name='products'),
+
+    path('api/', include('stores.urls'), name='products')
 
 ]

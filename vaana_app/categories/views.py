@@ -18,7 +18,7 @@ class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
     def get(self, request):
-        categories = Category.objects.all()
+        categories = Category.objects.filter(is_active=True)
         serializer = CategorySerializer(categories, many=True)
         return JsonResponse({'categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
         
@@ -27,7 +27,6 @@ class CategoryAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        print(request.user.id)
         
         try:
             category = Category.objects.create(
@@ -42,6 +41,13 @@ class CategoryAPIView(APIView):
             return JsonResponse({'categories': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+
+class CategoryDetailAPIView(APIView):
+
+    def get(self, request, category_id):
+        category = Category.objects.get(id=category_id)
+        serializer = CategorySerializer(category)
+        return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 class UpdateCategoryAPIView(APIView):
     permission_classes = (AllowAny, IsAuthenticated)

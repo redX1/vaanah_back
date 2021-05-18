@@ -1,4 +1,5 @@
 from rest_framework.decorators import permission_classes
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import JsonResponse
 from rest_framework.response import Response
@@ -23,7 +24,6 @@ class StoreAPIView(APIView):
         serializer = StoreSerializer(stores, many=True)
         return JsonResponse({'stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
-
     @permission_classes([IsAuthenticated])
     def post(self, request):
         payload = json.loads(request.body)
@@ -33,19 +33,14 @@ class StoreAPIView(APIView):
                 name=payload["name"],
                 created_at=payload["created_at"],
                 created_by=user,
-                store_address=payload['store_address']
+                store_address=payload['store_address'],
+                is_active= payload["is_active"]
             )
             serializer = StoreSerializer(store)
             return JsonResponse({'stores': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
-class StoreDetailAPIView(APIView):
-
-    def get(self, request, store_id):
-        store = Store.objects.get(id=store_id)
-        serializer = StoreSerializer(store)
-        return JsonResponse({'store': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 class StoreProductsAPIView(APIView):
     serializer_class = ProductSerializer
@@ -55,10 +50,14 @@ class StoreProductsAPIView(APIView):
         serializer = ProductSerializer(products, many=True)
         return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
-class UpdateStoreAPIView(APIView):
-    permission_classes = (AllowAny, IsAuthenticated)
-    serializer_class = ProductSerializer
+class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
 
+    def get(self, request, store_id):
+        products = Product.objects.filter(store=store_id)
+        serializer = ProductSerializer(products, many=True)
+        return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+    @permission_classes([IsAuthenticated])
     def put(self, request, store_id):
         user = request.user.id
         payload = json.loads(request.body)
@@ -71,10 +70,7 @@ class UpdateStoreAPIView(APIView):
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
-class DeleteStoreAPIView(APIView):
-    permission_classes = (AllowAny, IsAuthenticated)
-    serializer_class = ProductSerializer
-
+    @permission_classes([IsAuthenticated])
     def delete(self, request, store_id):
         user = request.user.id
         try:

@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.db import models
 from django.db.models.aggregates import Avg
-from rest_framework.exceptions import ValidationError
 from stores.models import Store
 from categories.models import Category
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -48,17 +47,10 @@ class Product(models.Model):
     
     rating = property(avg_rating)
 
-
-def validate_even(value):
-    if value < 1 or value > 5 :
-        raise ValidationError(
-            ('%(value)s is not an valid rating'),
-            params={'value': value},
-        )
 class Review(models.Model):
     title = models.CharField(max_length=255)
     comment = models.TextField()
-    rating = models.IntegerField(validators=[validate_even])
+    rating = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)

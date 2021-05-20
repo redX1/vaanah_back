@@ -10,10 +10,11 @@ class StoreSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'name', 
-            'created_at', 
             'created_by', 
             'store_address',
             "is_active",
+            "created_by",
+            "created_at",
             "products",
         ]
 

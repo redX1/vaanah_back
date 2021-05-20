@@ -4,8 +4,9 @@ from django.db.models.aggregates import Avg
 from stores.models import Store
 from categories.models import Category
 from django.core.validators import MinValueValidator, MaxValueValidator
+from cores.models import TimestampedModel
 
-class Product(models.Model):
+class Product(TimestampedModel):
     store = models.ForeignKey(Store, related_name='products', on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -13,13 +14,10 @@ class Product(models.Model):
     slug = models.SlugField()
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=15, decimal_places=3)
-    date_added = models.DateTimeField(auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, null=True)
     quantity = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    # review      = models.DecimalField(default=0.00,max_digits=100,decimal_places=2)
     class Meta:
-        ordering = ('date_added',)
+        ordering = ('name',)
     
     def __str__(self):
         return self.name
@@ -47,14 +45,12 @@ class Product(models.Model):
     
     rating = property(avg_rating)
 
-class Review(models.Model):
+class Review(TimestampedModel):
     title = models.CharField(max_length=255)
     comment = models.TextField()
     rating = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title

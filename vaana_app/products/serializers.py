@@ -13,8 +13,8 @@ class ReviewSerializer(serializers.ModelSerializer):
             "rating",
             "product",
             "user",
-            "created",
-            "updated"
+            "created_by",
+            "created_at",
         ]
 class ProductSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True)
@@ -31,9 +31,9 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_active",
             "quantity",
             "rating",
-            "date_added",
-            "last_updated",
             "created_by",
+            "created_by",
+            "created_at",
             "store",
             "reviews"
         ]

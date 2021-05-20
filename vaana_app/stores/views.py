@@ -31,7 +31,6 @@ class StoreAPIView(APIView):
         try:
             store = Store.objects.create(
                 name=payload["name"],
-                created_at=payload["created_at"],
                 created_by=user,
                 store_address=payload['store_address'],
                 is_active= payload["is_active"]

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +27,6 @@ SECRET_KEY = 'django-insecure-u8*p#)cuf@tp10yr31=urf)s44ihb688#wc06$=y4_xwy)15dg
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -95,8 +96,8 @@ DATABASES = {
         'NAME': 'vaanahdb',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'HOST': 'vaanah-database',
+        'PORT': '5432',
     }
 }
 
@@ -139,11 +140,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+CORS_ORIGIN_WHITELIST = ['*']
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'cores.exceptions.core_exception_handler',
@@ -161,3 +163,5 @@ REST_FRAMEWORK = {
 # the `authentication` module. This module is registered above in a setting
 # called `INSTALLED_APPS`.
 AUTH_USER_MODEL = 'users.User'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

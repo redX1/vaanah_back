@@ -14,3 +14,12 @@ Djando-Postgresql Backend for Vaanah
 * On Windows : $ source [virtualenv-name]/Scripts/activate
 
 4- You can now run the development server : $ python3 manage.py runserver
+
+
+## Run the project with Docker
+
+### Before building the image, make sure you have [docker](https://docs.docker.com/engine/install/) and [docker-compse](https://docs.docker.com/compose/install/) installed on your machine
+
+You can run the application with this command ```docker-compose up --build -d```
+
+The application is running in the port 8000

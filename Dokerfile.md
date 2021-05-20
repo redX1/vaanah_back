@@ -4,7 +4,7 @@
 
 ### Follow these steps :
 
-1. Build the image by running this command : ```docker build -t give_a_tag .``` *provide the tag you want to your image(ex eg_postgresql)*
+1. Build the image by running this command : ```docker build -t give_a_tag -f- . < Dockerfile.postgres``` *provide the tag you want to your image(ex eg_postgresql)*
 2. Run the image with this command : ```docker run -d --rm -p listening_port:5432 given_tag``` *provide a free port of your machine *
 
 

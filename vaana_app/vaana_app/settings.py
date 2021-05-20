@@ -26,8 +26,8 @@ SECRET_KEY = 'django-insecure-u8*p#)cuf@tp10yr31=urf)s44ihb688#wc06$=y4_xwy)15dg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -61,6 +61,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'vaana_app.urls'
@@ -93,8 +96,8 @@ DATABASES = {
         'NAME': 'vaanahdb',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': '192.168.1.24',
-        'PORT': '5433',
+        'HOST': 'vaanah-database',
+        'PORT': '5432',
     }
 }
 

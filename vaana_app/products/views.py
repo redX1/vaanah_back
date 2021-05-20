@@ -13,8 +13,8 @@ from rest_framework import status
 import json
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Product, Category, Store
-from .serializers import ProductSerializer
+from .models import Product, Category, Review, Store
+from .serializers import ProductSerializer, ReviewSerializer
 
 
 class ProductAPIView(APIView):
@@ -32,7 +32,6 @@ class ProductAPIView(APIView):
         user = request.user
         try:
             product = Product.objects.create(
-                id=payload["id"],
                 category=Category.objects.get(id=payload['category']),
                 name=payload["name"],
                 slug=payload["slug"],
@@ -40,7 +39,6 @@ class ProductAPIView(APIView):
                 price=payload["price"],
                 is_active= payload["is_active"],
                 quantity= payload["quantity"],
-                date_added=payload["date_added"],
                 created_by=user,
                 store=Store.objects.get(id=payload['store'])
             )
@@ -49,13 +47,12 @@ class ProductAPIView(APIView):
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
-
-
 class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
     serializer_class = ProductSerializer
 
     def get(self, request, product_id):
         product = Product.objects.get(id=product_id)
+        # print(product.avg_rating)
         serializer = ProductSerializer(product)
         return JsonResponse({'product': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
@@ -78,8 +75,64 @@ class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
         try:
             product = Product.objects.get(created_by=user, id=product_id)
             product.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response('Success' ,status=status.HTTP_204_NO_CONTENT)
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
+class ReviewAPIView(APIView):
+    serializer_class = ReviewSerializer
+
+    def get(self, request):
+        reviews = Review.objects.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return JsonResponse({'reviews': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def post(self, request):
+        payload = json.loads(request.body)
+        user = request.user
+        try:
+            review = Review.objects.create(
+                title=payload["title"],
+                comment=payload["comment"],
+                rating=payload["rating"],
+                product=Product.objects.get(id=payload['product']),
+                user=user
+            )
+            serializer = ReviewSerializer(review)
+            return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
+        except ObjectDoesNotExist as e:
+            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+
+class RetrieveDeleteUpdateReviewAPIView(RetrieveUpdateAPIView):
+    serializer_class = ReviewSerializer
+
+    def get(self, request, review_id):
+        review = Review.objects.get(id=review_id)
+        serializer = ReviewSerializer(review)
+        return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+    @permission_classes([IsAuthenticated])
+    def update(self, request, review_id):
+        user = request.user.id
+        payload = json.loads(request.body)
+        try:
+            review_item = Review.objects.filter(user=user, id=review_id)
+            review_item.update(**payload)
+            review = Review.objects.get(id=review_id)
+            serializer = ReviewSerializer(review)
+            return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist as e:
+            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+
+    @permission_classes([IsAuthenticated])
+    def delete(self, request, review_id):
+        user = request.user.id
+        try:
+            review = Review.objects.get(user=user, id=review_id)
+            review.delete()
+            return Response('Success' ,status=status.HTTP_204_NO_CONTENT)
+        except ObjectDoesNotExist as e:
+            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 

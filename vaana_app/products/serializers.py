@@ -1,7 +1,24 @@
 from rest_framework import serializers
-from .models import Product
+from .models import Product, Review
 
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            "id",
+            "title",
+            "comment",
+            "rating",
+            "product",
+            "user",
+            "created_by",
+            "created_at",
+        ]
 class ProductSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True)
+
     class Meta:
         model = Product
         fields = [
@@ -13,9 +30,10 @@ class ProductSerializer(serializers.ModelSerializer):
             "category",
             "is_active",
             "quantity",
-            "date_added",
+            "rating",
             "created_by",
-            "store"
+            "created_by",
+            "created_at",
+            "store",
+            "reviews"
         ]
-
-

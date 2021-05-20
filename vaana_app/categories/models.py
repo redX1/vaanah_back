@@ -1,8 +1,9 @@
+from cores.models import TimestampedModel
 from django.db import models
 from django.conf import settings
 
 # Create your models here.
-class Category(models.Model):
+class Category(TimestampedModel):
     name        = models.CharField(max_length=255)
     description = models.TextField() 
     slug        = models.SlugField()

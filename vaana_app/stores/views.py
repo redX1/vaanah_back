@@ -42,20 +42,13 @@ class StoreAPIView(APIView):
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
 
-class StoreProductsAPIView(APIView):
-    serializer_class = ProductSerializer
-
-    def get(self, request, store_id):
-        products = Product.objects.filter(store=store_id)
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_200_OK)
-
 class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
 
     def get(self, request, store_id):
-        products = Product.objects.filter(store=store_id)
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        stores = Store.objects.filter(id=store_id)
+        serializer = StoreSerializer(stores, many=True)
+        return JsonResponse({'store': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
 
     @permission_classes([IsAuthenticated])
     def put(self, request, store_id):
@@ -76,7 +69,7 @@ class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
         try:
             store = Store.objects.get(created_by=user, id=store_id)
             store.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response('Success' ,status=status.HTTP_204_NO_CONTENT)
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 

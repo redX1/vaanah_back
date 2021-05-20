@@ -31,7 +31,6 @@ class CategoryAPIView(APIView):
         
         try:
             category = Category.objects.create(
-                id=payload["id"],
                 name=payload["name"],
                 slug=payload["slug"],
                 is_active= payload["is_active"],

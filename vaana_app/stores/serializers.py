@@ -15,6 +15,7 @@ class StoreSerializer(serializers.ModelSerializer):
             "is_active",
             "created_by",
             "created_at",
+            "updated_at",
             "products",
         ]
 

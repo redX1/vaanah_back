@@ -96,8 +96,8 @@ DATABASES = {
         'NAME': 'vaanahdb',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': 'vaanah-database',
-        'PORT': '5432',
+        'HOST': 'ec2-18-193-106-119.eu-central-1.compute.amazonaws.com',
+        'PORT': '5434',
     }
 }
 
@@ -140,7 +140,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CORS_ORIGIN_WHITELIST = ['*']
+#CORS_ORIGIN_WHITELIST = ['*']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

@@ -15,13 +15,14 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Product, Category, Review, Store
 from .serializers import ProductSerializer, ReviewSerializer
+from django.utils.timezone import now
 
 
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer
 
     def get(self, request):
-        products = Product.objects.filter(is_active=True)
+        products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
@@ -62,7 +63,10 @@ class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
         payload = json.loads(request.body)
         try:
             product_item = Product.objects.filter(created_by=user, id=product_id)
-            product_item.update(**payload)
+            product_item.update(
+                **payload,
+                updated_at=now()
+                )
             product = Product.objects.get(id=product_id)
             serializer = ProductSerializer(product)
             return JsonResponse({'product': serializer.data}, safe=False, status=status.HTTP_200_OK)
@@ -78,6 +82,35 @@ class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
             return Response('Success' ,status=status.HTTP_204_NO_CONTENT)
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+
+
+class ProductActivatedAPIView(APIView):
+    def get(self, request):
+        products = Product.objects.filter(is_active=True)
+        serializer = ProductSerializer(products, many=True)
+        return JsonResponse({'activated products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+class ProductDeactivatedAPIView(APIView):
+
+    def get(self, request):
+        products = Product.objects.filter(is_active=False)
+        serializer = ProductSerializer(products, many=True)
+        return JsonResponse({'deactivated products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+
+class LatestProductAPIView(APIView):
+    def get(self, request):
+        products = Product.objects.filter(is_active=True)[0:2]
+        serializer = ProductSerializer(products, many=True)
+        return JsonResponse({'latest products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+class ProductReviewsAPIView(APIView):
+    serializer_class = ReviewSerializer
+
+    def get(self, request, product_id):
+        reviews = Review.objects.filter(product=product_id)
+        serializer = ReviewSerializer(reviews, many=True)
+        return JsonResponse({'product reviews': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 class ReviewAPIView(APIView):
     serializer_class = ReviewSerializer
@@ -119,7 +152,10 @@ class RetrieveDeleteUpdateReviewAPIView(RetrieveUpdateAPIView):
         payload = json.loads(request.body)
         try:
             review_item = Review.objects.filter(user=user, id=review_id)
-            review_item.update(**payload)
+            review_item.update(
+                **payload,
+                updated_at=now()
+                )
             review = Review.objects.get(id=review_id)
             serializer = ReviewSerializer(review)
             return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_200_OK)

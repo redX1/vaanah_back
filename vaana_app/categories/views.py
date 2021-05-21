@@ -13,13 +13,14 @@ from .serializers import CategorySerializer
 from .models import Category
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import permission_classes
-
-
+from products.models import Product
+from products.serializers import ProductSerializer
+from django.utils.timezone import now
 class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
     def get(self, request):
-        categories = Category.objects.filter(is_active=True)
+        categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return JsonResponse({'categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
         
@@ -57,8 +58,10 @@ class RetrieveDeleteUpdateCategoryAPIView(RetrieveUpdateAPIView):
         payload = json.loads(request.body)
         try:
             category_item = Category.objects.filter(created_by=user, id=category_id)
-            # returns 1 or 0
-            category_item.update(**payload)
+            category_item.update(
+                **payload,
+                updated_at=now()
+                )
             category = Category.objects.get(id=category_id)
             serializer = CategorySerializer(category)
             return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_200_OK)
@@ -75,3 +78,31 @@ class RetrieveDeleteUpdateCategoryAPIView(RetrieveUpdateAPIView):
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
+
+class CategoryProductsAPIView(APIView):
+    serializer_class = ProductSerializer
+
+    def get(self, request, category_id):
+        products = Product.objects.filter(category=category_id)
+        serializer = ProductSerializer(products, many=True)
+        return JsonResponse({'category products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+
+class CategoryActivatedAPIView(APIView):
+    def get(self, request):
+        categories = Category.objects.filter(is_active=True)
+        serializer = CategorySerializer(categories, many=True)
+        return JsonResponse({'activated categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+class CategoryDeactivatedAPIView(APIView):
+
+    def get(self, request):
+        categories = Category.objects.filter(is_active=False)
+        serializer = CategorySerializer(categories, many=True)
+        return JsonResponse({'deactivated categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+class LatestCategoryAPIView(APIView):
+    def get(self, request):
+        categories = Category.objects.filter(is_active=True)[0:2]
+        serializer = CategorySerializer(categories, many=True)
+        return JsonResponse({'latest categories': serializer.data}, safe=False, status=status.HTTP_200_OK)

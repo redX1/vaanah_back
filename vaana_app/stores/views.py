@@ -14,13 +14,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from products.models import Product
 from products.serializers import ProductSerializer
 from rest_framework.views import APIView
+from django.utils.timezone import now
 
 
 class StoreAPIView(APIView):
     serializer_class = ProductSerializer
 
     def get(self, request):
-        stores = Store.objects.filter(is_active=True)
+        stores = Store.objects.all()
         serializer = StoreSerializer(stores, many=True)
         return JsonResponse({'stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
@@ -55,7 +56,10 @@ class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
         payload = json.loads(request.body)
         try:
             store_item = Store.objects.filter(created_by=user, id=store_id)
-            store_item.update(**payload)
+            store_item.update(
+                **payload,
+                updated_at=now()
+                )
             store = Store.objects.get(id=store_id)
             serializer = StoreSerializer(store)
             return JsonResponse({'store': serializer.data}, safe=False, status=status.HTTP_200_OK)
@@ -72,3 +76,30 @@ class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
+class StoreProductsAPIView(APIView):
+    serializer_class = ProductSerializer
+
+    def get(self, request, store_id):
+        products = Product.objects.filter(store=store_id)
+        serializer = ProductSerializer(products, many=True)
+        return JsonResponse({'store products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+
+class StoreActivatedAPIView(APIView):
+    def get(self, request):
+        stores = Store.objects.filter(is_active=True)
+        serializer = StoreSerializer(stores, many=True)
+        return JsonResponse({'activated stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+
+class StoreDeactivatedAPIView(APIView):
+    def get(self, request):
+        stores = Store.objects.filter(is_active=False)
+        serializer = StoreSerializer(stores, many=True)
+        return JsonResponse({'deactivated stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+class LatestStoreAPIView(APIView):
+    def get(self, request):
+        stores = Store.objects.filter(is_active=True)[0:2]
+        serializer = StoreSerializer(stores, many=True)
+        return JsonResponse({'latest stores': serializer.data}, safe=False, status=status.HTTP_200_OK)

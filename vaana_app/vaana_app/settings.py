@@ -97,7 +97,7 @@ DATABASES = {
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
         'HOST': 'ec2-18-193-106-119.eu-central-1.compute.amazonaws.com',
-        'PORT': '5434',
+        'PORT': '5432',
     }
 }
 

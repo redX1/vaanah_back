@@ -9,6 +9,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from cores.models import TimestampedModel
+import uuid
 
 
 class UserManager(BaseUserManager):
@@ -54,6 +55,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     # Each `User` needs a human-readable unique identifier that we can use to
     # represent the `User` in the UI. We want to index this column in the
     # database to improve lookup performance.
@@ -88,6 +91,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # Tells Django that the UserManager class defined above should manage
     # objects of this type.
     objects = UserManager()
+
+    # def user_id(self):
+    #     return self.id.__str__()
 
     def __str__(self):
         """

@@ -1,6 +1,7 @@
+from logging import exception
 from rest_framework.serializers import Serializer
-from backend.vaana_app.carts.models import Cart
-from backend.vaana_app.carts.serializers import CartSerializer
+from .models import Cart, CartItem
+from .serializers import CartSerializer, CartItemSerializer
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -13,30 +14,120 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from products.models import Product
+
+
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 class CartAddView(APIView):
 
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        request_body=CartSerializer,
+        security=[],
+        tags=['Carts'],
+    )
+    @csrf_exempt
     @permission_classes([IsAuthenticated])
     def post(self, request, *args, **kwargs):
         user = request.user
-        cart = Cart.objects.get(owner = user, status = Cart.OPEN)
 
         response = {
-            'message': 'This user already have an open cart',
+            'body': {
+                'error': 'This user already have an open cart'
+            },
             'status': status.HTTP_400_BAD_REQUEST
         }
 
-        if cart is None:
-            serializer = CartSerializer(data=json.loads(request.body))
-
-            response['message'] = 'This user already have an open cart'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-
-            if serializer.is_valid():
-                serializer.save()
-
-                response['message'] = serializer.data
+        try:
+            cart = Cart.objects.get(owner = user, status = Cart.OPEN)
+            response ['body']['data'] = CartSerializer(cart).data
+            
+        except Exception:
+            try:
+                cart = Cart.objects.create(owner=user)
+                serializer = CartSerializer(cart)
+                response['body'] = serializer.data
                 response['status'] = status.HTTP_201_CREATED
 
-        return JsonResponse(response['message'], status = response['status'])
+            except Exception as exception:
+                response['body']['error'] = str(exception)
+                response['status'] = status.HTTP_500_INTERNAL_SERVER_ERROR  
+
+        return JsonResponse(response['body'], status = response['status'])
+
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        security=[],
+        tags=['Carts'],
+    )
+    @permission_classes([IsAuthenticated])
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        
+        try:
+            cart = Cart.objects.get(owner = user, status = Cart.OPEN)
+            response = {
+                'body': CartSerializer(cart).data,
+                'status': status.HTTP_200_OK
+            }
+        except Exception:
+            try:
+                cart = Cart.objects.create(owner=user)
+                serializer = CartSerializer(cart)
+                response = {
+                    'body': serializer.data,
+                    'status': status.HTTP_200_OK
+                }
+            except Exception as exception:
+                response = {
+                    'body': {
+                        'error': str(exception)
+                    },
+                    'status': status.HTTP_500_INTERNAL_SERVER_ERROR
+                }
+
+        return JsonResponse(response['body'], status = response['status']) 
+
+        
+class CartItemView(APIView):
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        request_body=CartItemSerializer,
+        security=[],
+        tags=['Carts'],
+    )
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        payload = json.loads(request.body)
+        serializer = CartItemSerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+
+        product = Product.objects.get(id=payload['product'])
+        response = {
+            'body': {
+                'error': 'quantity not allowed'
+            },
+            'status': status.HTTP_400_BAD_REQUEST
+        }
+
+        if product.quantity > payload['quantity']:
+                
+                try:
+                    cart = Cart.objects.get(owner=user)
+                except ObjectDoesNotExist:
+                    cart = Cart.objects.create(owner=user)
+
+                item = CartItem.objects.create(product=product, quantity=payload['quantity'])
+                cart.items.add(item)
+
+                response['body'] = CartSerializer(cart).data
+                response['status'] = status.HTTP_201_CREATED
+
+        
+        return JsonResponse(response['body'], status = response['status']) 
+        

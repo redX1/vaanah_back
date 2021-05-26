@@ -44,4 +44,4 @@ class Cart(TimestampedModel):
 
     editable_statuses = (OPEN, SAVED)
 
-    cart_items = models.ManyToManyField(CartItem)
+    items = models.ManyToManyField(CartItem, blank=True)

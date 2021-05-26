@@ -12,6 +12,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True)
     class Meta:
         model = Cart
         fields = [
@@ -19,5 +20,5 @@ class CartSerializer(serializers.ModelSerializer):
             "owner",
             "status",
             "merged_date",
-            "cart_items",
+            "items",
         ]

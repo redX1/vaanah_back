@@ -83,6 +83,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
 
     # More fields required by Django when specifying a custom user model.
 
+    is_verified = models.BooleanField(default=False)
+
+
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.
     USERNAME_FIELD = 'email'

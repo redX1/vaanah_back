@@ -47,7 +47,7 @@ class CartAddView(APIView):
             
         except Exception:
             try:
-                cart = Cart.objects.create(owner=user)
+                cart = Cart.objects.create(owner=user, status = Cart.OPEN)
                 serializer = CartSerializer(cart)
                 response['body'] = serializer.data
                 response['status'] = status.HTTP_201_CREATED
@@ -75,7 +75,7 @@ class CartAddView(APIView):
             }
         except Exception:
             try:
-                cart = Cart.objects.create(owner=user)
+                cart = Cart.objects.create(owner=user, status = Cart.OPEN)
                 serializer = CartSerializer(cart)
                 response = {
                     'body': serializer.data,
@@ -118,9 +118,9 @@ class CartItemView(APIView):
         if product.quantity > payload['quantity']:
                 
                 try:
-                    cart = Cart.objects.get(owner=user)
+                    cart = Cart.objects.get(owner=user, status = Cart.OPEN)
                 except ObjectDoesNotExist:
-                    cart = Cart.objects.create(owner=user)
+                    cart = Cart.objects.create(owner=user, status = Cart.OPEN)
 
                 item = CartItem.objects.create(product=product, quantity=payload['quantity'])
                 cart.items.add(item)

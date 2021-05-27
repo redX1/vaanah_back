@@ -1,8 +1,10 @@
+from re import U
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
 
 from .models import User
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -20,19 +22,41 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
 
+    tokens = serializers.SerializerMethodField()
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password', 'token']
+        fields = ['email', 'username', 'password', 'token', 'is_verified', 'tokens']
+
+    
+    def get_tokens(self, user):
+        refresh = RefreshToken.for_user(user)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
+    # def get_tokens(self, obj):
+    #     user = User.objects.get(email=obj['email'])
+
+    #     return {
+    #         'refresh': user.tokens()['refresh'],
+    #         'access': user.tokens()['access']
+    #     }
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
 
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=555)
+
+    class Meta:
+        model = User
+        fields = ['token']
 
 class LoginSerializer(serializers.Serializer):
-    # id = serializers.CharField(read_only=True)
+    # id = serializers.IntegerField(read_only=True)
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
@@ -83,13 +107,17 @@ class LoginSerializer(serializers.Serializer):
                 'This user has been deactivated.'
             )
 
+        if not user.is_verified:
+            raise serializers.ValidationError('Email is not verified')
+
         # The `validate` method should return a dictionary of validated data.
         # This is the data that is passed to the `create` and `update` methods
         # that we will see later on.
         return {
             'email': user.email,
             'username': user.username,
-            'token': user.token
+            'token': user.token,
+            'is_verified': user.is_verified
         }
 
 
@@ -109,7 +137,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'username', 'password', 'token',
+            'email', 'username', 'password', 'token', 'is_verified'
         )
 
         # The `read_only_fields` option is an alternative for explicitly

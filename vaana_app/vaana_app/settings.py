@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'categories',
     'products',
     'stores',
+    'carts',
+    'orders',
+    'addresses',
 ]
 
 MIDDLEWARE = [
@@ -94,10 +97,10 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vaanahdbfatma3',
+        'NAME': 'vaanahdb2',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': '3.66.215.238',
+        'HOST': 'ec2-3-66-215-238.eu-central-1.compute.amazonaws.com',
         'PORT': '5433',
     }
 }

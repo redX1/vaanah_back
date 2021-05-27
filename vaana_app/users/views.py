@@ -3,6 +3,7 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+import json
 
 from .renderers import UserJSONRenderer
 from .serializers import (
@@ -19,9 +20,14 @@ class RegistrationAPIView(APIView):
     renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
 
-    
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        request_body=RegistrationSerializer,
+        security=[],
+        tags=['Users'],
+    )
     def post(self, request):
-        user = request.data.get('user', {})
+        user = json.loads(request.body)
 
         # The create serializer, validate serializer, save serializer pattern
         # below is common and you will see it a lot throughout this course and
@@ -37,9 +43,15 @@ class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
-    
+
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        request_body=LoginSerializer,
+        security=[],
+        tags=['Users'],
+    )
     def post(self, request):
-        user = request.data.get('user', {})
+        user = json.loads(request.body)
 
         # Notice here that we do not call `serializer.save()` like we did for
         # the registration endpoint. This is because we don't actually have
@@ -56,6 +68,11 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
 
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        security=[],
+        tags=['Users'],
+    )
     def retrieve(self, request, *args, **kwargs):
         # There is nothing to validate or save here. Instead, we just want the
         # serializer to handle turning our `User` object into something that
@@ -64,9 +81,15 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
+
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        request_body=UserSerializer,
+        security=[],
+        tags=['Users'],
+    )    
     def update(self, request, *args, **kwargs):
-        user_data = request.data.get('user', {})
+        user_data = json.loads(request.body)
 
         serializer_data = {
             'username': user_data.get('username', request.user.username),

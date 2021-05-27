@@ -37,12 +37,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #path('api/', include('djoser.urls')),
     path('api/', include('users.urls'), name='users'),
+    
     path('swagger-ui', schema_view.with_ui('swagger', cache_timeout=0)),
 
     path('api/', include('categories.urls'), name='categories'),
 
     path('api/', include('products.urls'), name='products'),
 
-    path('api/', include('stores.urls'), name='products')
+    path('api/', include('stores.urls'), name='stores'),
+    
+    path('api/', include('carts.urls'), name='carts'),
 
 ]

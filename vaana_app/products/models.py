@@ -5,8 +5,10 @@ from stores.models import Store
 from categories.models import Category
 from django.core.validators import MinValueValidator, MaxValueValidator
 from cores.models import TimestampedModel
+import uuid
 
 class Product(TimestampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     store = models.ForeignKey(Store, related_name='products', on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -46,6 +48,7 @@ class Product(TimestampedModel):
     rating = property(avg_rating)
 
 class Review(TimestampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     comment = models.TextField()
     rating = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])

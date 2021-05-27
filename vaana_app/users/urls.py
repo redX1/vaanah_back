@@ -12,7 +12,6 @@ urlpatterns = [
     url(r'^users/?$', UserRetrieveUpdateAPIView.as_view()),
     url(r'^users/register/?$', RegistrationAPIView.as_view()),
     url(r'^users/login/?$', LoginAPIView.as_view()),
-
     path('users/verify/', VerifyEmail.as_view(), name="email-verify"),
     path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/reset/email/', RequestPasswordResetEmail.as_view(), name="request-reset-email"),

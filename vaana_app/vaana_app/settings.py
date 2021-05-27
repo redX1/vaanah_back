@@ -29,6 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -95,11 +96,11 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vaanahdb',
+        'NAME': 'vaanahdbfatma3',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': 'ec2-18-193-106-119.eu-central-1.compute.amazonaws.com',
-        'PORT': '5432',
+        'HOST': '3.66.215.238',
+        'PORT': '5433',
     }
 }
 

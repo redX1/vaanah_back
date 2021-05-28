@@ -9,6 +9,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from cores.models import TimestampedModel
+import uuid
 
 
 class UserManager(BaseUserManager):
@@ -54,6 +55,19 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
+
+    GENDER_CHOICES = (
+        ('M', 'M'),
+        ('F', 'F'),
+        ('Other', 'Other'),
+    )
+   
+    TYPE_CHOICES = (
+        ('Customer', 'Customer'),
+        ('Seller', 'Seller'),
+    )
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     # Each `User` needs a human-readable unique identifier that we can use to
     # represent the `User` in the UI. We want to index this column in the
     # database to improve lookup performance.
@@ -80,6 +94,12 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
 
     # More fields required by Django when specifying a custom user model.
 
+    is_verified = models.BooleanField(default=False)
+
+    
+    account_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Customer')
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='M')
+
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.
     USERNAME_FIELD = 'email'
@@ -88,6 +108,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # Tells Django that the UserManager class defined above should manage
     # objects of this type.
     objects = UserManager()
+
+    # def user_id(self):
+    #     return self.id.__str__()
 
     def __str__(self):
         """

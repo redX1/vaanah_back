@@ -1,9 +1,11 @@
 from cores.models import TimestampedModel
 from django.db import models
 from django.conf import settings
+import uuid
 
 # Create your models here.
 class Category(TimestampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name        = models.CharField(max_length=255)
     description = models.TextField() 
     slug        = models.SlugField()

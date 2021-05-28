@@ -22,3 +22,4 @@ class CartSerializer(serializers.ModelSerializer):
             "merged_date",
             "items",
         ]
+

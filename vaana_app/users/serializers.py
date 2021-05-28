@@ -25,12 +25,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
 
+    # account_type = serializers.ChoiceField(choices=User.GENDER_CHOICES)
+    # gender = serializers.ChoiceField(choices=User.TYPE_CHOICES)
+
     tokens = serializers.SerializerMethodField()
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password', 'token', 'is_verified', 'tokens']
+        fields = ['email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'tokens']
 
     
     def get_tokens(self, user):
@@ -120,7 +123,9 @@ class LoginSerializer(serializers.Serializer):
             'email': user.email,
             'username': user.username,
             'token': user.token,
-            'is_verified': user.is_verified
+            'is_verified': user.is_verified,
+            'account_type': user.account_type, 
+            'gender':user.gender,
         }
 
 

@@ -30,17 +30,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
-
 # smtp email configuration
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = 'smtp.strato.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'support@xegit.com'
-EMAIL_HOST_PASSWORD = 'Teranga.DevOps1'
-EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.ionos.de'
+EMAIL_HOST_USER = 'test.vaanah@kaeyros-analytics.de'
+EMAIL_HOST_PASSWORD = '$Happy.Vaanah$'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-# SITE_NAME = "Vaanah"
 
 # Application definition
 
@@ -109,10 +106,10 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vaanahdb2',
+        'NAME': 'vaanahdbfatma2',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': 'ec2-3-66-215-238.eu-central-1.compute.amazonaws.com',
+        'HOST': '3.122.225.2',
         'PORT': '5433',
     }
 }

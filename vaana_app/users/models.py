@@ -55,6 +55,17 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
+
+    GENDER_CHOICES = (
+        ('M', 'M'),
+        ('F', 'F'),
+        ('Other', 'Other'),
+    )
+   
+    TYPE_CHOICES = (
+        ('Customer', 'Customer'),
+        ('Seller', 'Seller'),
+    )
     # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # Each `User` needs a human-readable unique identifier that we can use to
@@ -85,6 +96,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
 
     is_verified = models.BooleanField(default=False)
 
+    
+    account_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Customer')
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='M')
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.

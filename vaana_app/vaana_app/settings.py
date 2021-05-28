@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'carts',
     'orders',
     'addresses',
+    'countries',
 ]
 
 MIDDLEWARE = [
@@ -100,7 +101,7 @@ DATABASES = {
         'NAME': 'vaanahdb2',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': 'ec2-3-66-215-238.eu-central-1.compute.amazonaws.com',
+        'HOST': '3.122.225.2',
         'PORT': '5433',
     }
 }

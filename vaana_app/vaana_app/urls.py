@@ -48,4 +48,6 @@ urlpatterns = [
     
     path('api/', include('carts.urls'), name='carts'),
 
+    path('api/', include('countries.urls'), name='countries')
+
 ]

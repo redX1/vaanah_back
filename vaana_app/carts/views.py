@@ -129,5 +129,40 @@ class CartItemView(APIView):
                 response['status'] = status.HTTP_201_CREATED
 
         
-        return JsonResponse(response['body'], status = response['status']) 
+        return JsonResponse(response['body'], status = response['status'])
+
+
+class CartItemUpdateView(RetrieveUpdateAPIView):
         
+        @csrf_exempt
+        @permission_classes([IsAuthenticated])
+        def delete(self, request, id):
+            user = request.user
+
+            try:
+                
+                cart = Cart.objects.get(owner=user, status = Cart.OPEN)
+                try:
+                    cart_item = CartItem.objects.get(id=id)
+                    cart.items.remove(cart_item)
+                    response = {
+                        'body': CartSerializer(cart).data,
+                        'status': status.HTTP_200_OK
+                    }
+                except ObjectDoesNotExist:
+                    response = {
+                        'body': {
+                            'error': 'Cart item not founded'
+                        },
+                        'status': status.HTTP_404_NOT_FOUND
+                    }
+
+            except ObjectDoesNotExist:
+                response = {
+                    'body': {
+                        'error': 'Any open cart founded'
+                    },
+                    'status': status.HTTP_404_NOT_FOUND
+                }
+
+            return JsonResponse(response['body'], status = response['status'])

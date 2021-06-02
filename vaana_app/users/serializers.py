@@ -1,13 +1,18 @@
+from re import U
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 
 from .models import User
-
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from django.utils.encoding import smart_str, force_str
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
-
+  
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
     password = serializers.CharField(
@@ -20,23 +25,42 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
 
+    tokens = serializers.SerializerMethodField()
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password', 'token']
+        fields = ('email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'tokens')
+
+    
+    def get_tokens(self, user):
+        refresh = RefreshToken.for_user(user)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
 
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=555)
+
+    class Meta:
+        model = User
+        fields = ['token']
 
 class LoginSerializer(serializers.Serializer):
-    # id = serializers.CharField(read_only=True)
+    # id = serializers.IntegerField(read_only=True)
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
+
+    # is_verified = serializers.BooleanField(read_only=True)
+    account_type = serializers.CharField(read_only=True)
+    gender = serializers.CharField(read_only=True)
 
     def validate(self, data):
         # The `validate` method is where we make sure that the current
@@ -83,18 +107,26 @@ class LoginSerializer(serializers.Serializer):
                 'This user has been deactivated.'
             )
 
+        if not user.is_verified:
+            raise serializers.ValidationError('Email is not verified')
+
         # The `validate` method should return a dictionary of validated data.
         # This is the data that is passed to the `create` and `update` methods
         # that we will see later on.
         return {
             'email': user.email,
             'username': user.username,
-            'token': user.token
+            'token': user.token,
+            'account_type': user.account_type, 
+            'gender':user.gender,
         }
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Handles serialization and deserialization of User objects."""
+       
+    account_type = serializers.CharField()
+    gender = serializers.CharField()
 
     # Passwords must be at least 8 characters, but no more than 128
     # characters. These values are the default provided by Django. We could
@@ -109,7 +141,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'username', 'password', 'token',
+            'email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender'
         )
 
         # The `read_only_fields` option is an alternative for explicitly
@@ -148,3 +180,45 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class ResetPasswordEmailRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(min_length=2)
+
+    redirect_url = serializers.CharField(max_length=500, required=False)
+
+    class Meta:
+        fields = ['email']
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(
+        min_length=6, max_length=68, write_only=True)
+    token = serializers.CharField(
+        min_length=1, write_only=True)
+    uidb64 = serializers.CharField(
+        min_length=1, write_only=True)
+
+    class Meta:
+        fields = ['password', 'token', 'uidb64']
+
+    def validate(self, attrs):
+        try:
+            password = attrs.get('password')
+            token = attrs.get('token')
+            uidb64 = attrs.get('uidb64')
+
+            id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=id)
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                raise AuthenticationFailed('The reset link is invalid', 401)
+
+            user.set_password(password)
+            user.save()
+
+            return (user)
+        except Exception as e:
+            raise AuthenticationFailed('The reset link is invalid', 401)
+        return super().validate(attrs)
+
+

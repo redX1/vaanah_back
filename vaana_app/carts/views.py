@@ -127,8 +127,7 @@ class CartItemView(APIView):
 
                 response['body'] = CartSerializer(cart).data
                 response['status'] = status.HTTP_201_CREATED
-
-        
+                
         return JsonResponse(response['body'], status = response['status'])
 
 

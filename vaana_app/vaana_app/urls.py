@@ -48,4 +48,7 @@ urlpatterns = [
     
     path('api/', include('carts.urls'), name='carts'),
 
+    path('api/', include('emails.urls'), name='emails'),
+
+
 ]

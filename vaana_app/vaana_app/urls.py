@@ -50,5 +50,6 @@ urlpatterns = [
 
     path('api/', include('emails.urls'), name='emails'),
 
+    path('api/', include('countries.urls'), name='countries')
 
 ]

@@ -42,7 +42,7 @@ class StoreAPIView(APIView):
             except ObjectDoesNotExist as e:
                 return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
-            return JsonResponse({'error':'You are not a seller !'}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({'error':'You are not a seller !'}, status=status.HTTP_403_FORBIDDEN)
 
 class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
 

@@ -61,7 +61,6 @@ class LoginSerializer(serializers.Serializer):
     # is_verified = serializers.BooleanField(read_only=True)
     account_type = serializers.CharField(read_only=True)
     gender = serializers.CharField(read_only=True)
-    # address = serializers.CharField(read_only=True)
 
     def validate(self, data):
         # The `validate` method is where we make sure that the current
@@ -129,7 +128,6 @@ class UserSerializer(serializers.ModelSerializer):
        
     account_type = serializers.CharField()
     gender = serializers.CharField()
-    # address = serializers.CharField(read_only=True)
 
     # Passwords must be at least 8 characters, but no more than 128
     # characters. These values are the default provided by Django. We could
@@ -144,7 +142,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender'#, 'address'
+            'email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender'
         )
 
         # The `read_only_fields` option is an alternative for explicitly

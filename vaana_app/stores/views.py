@@ -29,18 +29,20 @@ class StoreAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        try:
-            store = Store.objects.create(
-                name=payload["name"],
-                created_by=user,
-                store_address=payload['store_address'],
-                is_active= payload["is_active"]
-            )
-            serializer = StoreSerializer(store)
-            return JsonResponse({'stores': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
-        except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
-
+        if user.account_type == 'Seller':
+            try:
+                store = Store.objects.create(
+                    name=payload["name"],
+                    created_by=user,
+                    store_address=payload['store_address'],
+                    is_active= payload["is_active"]
+                )
+                serializer = StoreSerializer(store)
+                return JsonResponse({'stores': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
+            except ObjectDoesNotExist as e:
+                return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return JsonResponse({'error':'You are not a seller !'}, status=status.HTTP_403_FORBIDDEN)
 
 class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
 
@@ -103,3 +105,5 @@ class LatestStoreAPIView(APIView):
         stores = Store.objects.filter(is_active=True)[0:2]
         serializer = StoreSerializer(stores, many=True)
         return JsonResponse({'latest stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+

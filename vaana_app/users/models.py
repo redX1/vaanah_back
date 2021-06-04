@@ -1,4 +1,5 @@
 
+from addresses.models import Address
 import jwt
 
 from datetime import datetime, timedelta
@@ -99,6 +100,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     
     account_type = models.CharField(max_length=20, default='Customer')
     gender = models.CharField(max_length=20, default='M')
+
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.

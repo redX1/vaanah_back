@@ -1,4 +1,4 @@
-from re import U
+from re import T, U
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
@@ -119,6 +119,7 @@ class LoginSerializer(serializers.Serializer):
             'token': user.token,
             'account_type': user.account_type, 
             'gender':user.gender,
+            # 'address':user.address,
         }
 
 

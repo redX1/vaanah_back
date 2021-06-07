@@ -104,7 +104,7 @@ class RegistrationAPIView(APIView):
 
         try:
             # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-            absurl = 'http://18.193.203.105:8082/email/verify/'+"?token="+str(token)
+            absurl = 'http://18.193.203.105:8083/email/verify/'+"?token="+str(token)
             email_body = 'Hi '+user.username +' \n  Use the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Verify your email'}
@@ -113,7 +113,7 @@ class RegistrationAPIView(APIView):
             return Response(user_data, status=status.HTTP_201_CREATED)
         except jwt.ExpiredSignatureError as identifier:
             # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-            absurl = 'http://18.193.203.105:8082/email/verify/'+"?token="+str(refresh)
+            absurl = 'http://18.193.203.105:8083/email/verify/'+"?token="+str(refresh)
             email_body = 'Hi '+user.username +' \n  Use the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}

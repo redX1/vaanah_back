@@ -31,6 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_active",
             "quantity",
             "rating",
+            # "image",
             "created_by",
             "created_at",
             "updated_at",

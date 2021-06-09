@@ -103,9 +103,10 @@ class RegistrationAPIView(APIView):
         refresh = ref['refresh']
 
         try:
-            # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-            absurl = 'http://18.193.203.105:8083/email/verify/'+"?token="+str(token)
-            email_body = 'Hi '+user.username +' \n  Use the link below to verify your email \n' + absurl
+            email = user.email
+            #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
+            absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
+            email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Verify your email'}
             Util.send_email(data)
@@ -113,23 +114,51 @@ class RegistrationAPIView(APIView):
             return Response(user_data, status=status.HTTP_201_CREATED)
         except jwt.ExpiredSignatureError as identifier:
             # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-            absurl = 'http://18.193.203.105:8083/email/verify/'+"?token="+str(refresh)
-            email_body = 'Hi '+user.username +' \n  Use the link below to verify your email \n' + absurl
+            absurl = 'http://localhost:4200/email/verify/'+"?token="+str(refresh)
+            email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
             Util.send_email(data)
 
             return Response(user_data, status=status.HTTP_201_CREATED)
+class ResendEmailAPI(APIView):
+    serializer_class = RegistrationSerializer
+
+    def get (self, request):
+        user = request.data
+        # serializer = self.serializer_class(data=user)
+        # serializer.is_valid(raise_exception=True)
+
+        # user_data = serializer.data
+        # body = request.body
+
+        email = user['email']
+        # print(user)
+        user = User.objects.get(email=email)
+        token = RefreshToken.for_user(user).access_token
+        current_site = get_current_site(request).domain
+        relativeLink = reverse('email-resend')
+        #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
+        absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
+        email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
+        data = {'email_body': email_body, 'to_email': user.email,
+            'email_subject': 'Verify your email'}
+        Util.send_email(data)
+        return Response(user, status=status.HTTP_201_CREATED)
+
 
 class VerifyEmail(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         token = request.GET.get('token')
+        #email = re
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
             user = User.objects.get(id=payload['user_id'])
+            # print(payload['user'])
+
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
@@ -245,7 +274,7 @@ class RequestPasswordResetEmail(APIView):
 
             redirect_url = request.data.get('redirect_url', '')
             #absurl = 'http://'+current_site + relativeLink
-            absurl = 'http://18.193.203.105:8082' + relativeLink
+            absurl = 'http://localhost:4200' + relativeLink
             email_body = 'Hello, \nUse link below to reset your password  \n' + \
                 absurl+"?redirect_url="+redirect_url
             data = {'email_body': email_body, 'to_email': user.email,

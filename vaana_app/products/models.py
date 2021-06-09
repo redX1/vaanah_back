@@ -18,6 +18,8 @@ class Product(TimestampedModel):
     price = models.DecimalField(max_digits=15, decimal_places=3)
     quantity = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='product_images', null=True)
+
     class Meta:
         ordering = ('name',)
     

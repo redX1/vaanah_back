@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse
 from rest_framework import pagination
 from stores.models import Store
@@ -87,65 +88,48 @@ class RegistrationAPIView(APIView):
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         token = RefreshToken.for_user(user).access_token
+        email = user.email
+
         # token = user_data['token']
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
-        # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-        # email_body = 'Hi '+user.username +' \n  Use the link below to verify your email \n' + absurl
-        # data = {'email_body': email_body, 'to_email': user.email,
-        #         'email_subject': 'Verify your email'}
+        #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ "&email="+ email
+        absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email        
+        email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
+        data = {'email_body': email_body, 'to_email': user.email,
+                'email_subject': 'Verify your email'}
 
-        # Util.send_email(data)
+        Util.send_email(data)
 
-        # return Response(user_data, status=status.HTTP_201_CREATED)
+        return Response(user_data, status=status.HTTP_201_CREATED)
 
-        ref = user_data['tokens']
-        refresh = ref['refresh']
+class ResendEmailAPI(APIView):
+    serializer_class = ResetPasswordEmailRequestSerializer
+
+    def post (self, request):
+        user = json.loads(request.body)
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
 
         try:
-            email = user.email
+            email = serializer.data['email']
+            user = User.objects.get(email=email)
+            token = RefreshToken.for_user(user).access_token
+            current_site = get_current_site(request).domain
+            relativeLink = reverse('email-resend')
             #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
             absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
             email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
-                    'email_subject': 'Verify your email'}
-            Util.send_email(data)
-
-            return Response(user_data, status=status.HTTP_201_CREATED)
-        except jwt.ExpiredSignatureError as identifier:
-            # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-            absurl = 'http://localhost:4200/email/verify/'+"?token="+str(refresh)
-            email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
-            data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
-
             Util.send_email(data)
+            return Response({'code': '200'} , status=status.HTTP_200_OK)
+        except ObjectDoesNotExist as e:
+            return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return JsonResponse({'code': '500'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            return Response(user_data, status=status.HTTP_201_CREATED)
-class ResendEmailAPI(APIView):
-    serializer_class = RegistrationSerializer
 
-    def get (self, request):
-        user = request.data
-        # serializer = self.serializer_class(data=user)
-        # serializer.is_valid(raise_exception=True)
-
-        # user_data = serializer.data
-        # body = request.body
-
-        email = user['email']
-        # print(user)
-        user = User.objects.get(email=email)
-        token = RefreshToken.for_user(user).access_token
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-resend')
-        #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
-        absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
-        email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email,
-            'email_subject': 'Verify your email'}
-        Util.send_email(data)
-        return Response(user, status=status.HTTP_201_CREATED)
 
 
 class VerifyEmail(APIView):

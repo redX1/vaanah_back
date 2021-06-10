@@ -35,29 +35,41 @@ from django.http import HttpResponsePermanentRedirect
 import os
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.settings import api_settings
-# print (api_settings.DEFAULT_AUTHENTICATION_CLASSES)
+from rest_framework import viewsets
 
-class CustomPagination(pagination.PageNumberPagination):
+
+
+class StandardResultsSetPagination(pagination.PageNumberPagination):
+
     def get_paginated_response(self, data):
 
         return Response({
-            'next': self.get_next_link(),
-            'previous': self.get_previous_link(),
-            'count': self.page.paginator.count,
-            'results': data,
-            # ^^^^^^^^^^^^^^^^^^^^^^
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'current_page': int(self.request.query_params.get('page', 1)),
+            'total': self.page.paginator.count,
+            'per_page': self.page_size,
+            'total_pages': round(self.page.paginator.count/self.page_size, 1),
+            'data': data,
         })
 class UserAPIView(ListAPIView):
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
-    pagination_class = LimitOffsetPagination
-
+    # pagination_class = LimitOffsetPagination
+    
     def get(self, request):
-        users = User.objects.all()
-        print (api_settings.DEFAULT_PAGINATION_CLASS)
+        queryset = User.objects.all()
+        paginator = StandardResultsSetPagination()
 
-        serializer = UserSerializer(users, many=True)
-        return JsonResponse({'users': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        page_size = 5
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(queryset, request)
+
+        serializer = UserSerializer(page, many=True)
+        result = paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
 class CustomRedirect(HttpResponsePermanentRedirect):
 
@@ -152,6 +164,7 @@ class VerifyEmail(APIView):
         except jwt.exceptions.DecodeError as identifier:
             return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
+          
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
@@ -245,7 +258,9 @@ class RequestPasswordResetEmail(APIView):
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Reset your passsword'}
             Util.send_email(data)
-        return Response({'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+            return Response({'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'Your are not a user please register !'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PasswordTokenCheckAPI(APIView):

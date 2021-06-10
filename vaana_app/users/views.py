@@ -117,6 +117,7 @@ class ResendEmailAPI(APIView):
             token = RefreshToken.for_user(user).access_token
             current_site = get_current_site(request).domain
             relativeLink = reverse('email-resend')
+
             #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
             absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
             email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
@@ -128,7 +129,6 @@ class ResendEmailAPI(APIView):
             return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception:
             return JsonResponse({'code': '500'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 
@@ -151,25 +151,6 @@ class VerifyEmail(APIView):
             return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError as identifier:
             return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-# class VerifyEmail(APIView):
-#     permission_classes = [AllowAny]
-#     serializer_class = EmailVerificationSerializer
-   
-#     def get(self, request):
-#         token = request.GET.get('token')
-#         try:
-#             payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
-#             user = User.objects.get(id=payload['user_id'])
-#             if not user.is_verified:
-#                 user.is_verified = True
-#                 user.save()
-#             return Response({'Account successfully activated'}, status=status.HTTP_200_OK)
-#         except jwt.ExpiredSignatureError as identifier:
-#             return Response({'error': 'Activation expired'}, status=status.HTTP_400_BAD_REQUEST)
-#         except jwt.exceptions.DecodeError as identifier:
-#             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)

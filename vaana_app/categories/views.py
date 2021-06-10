@@ -1,4 +1,5 @@
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import JsonResponse
 from rest_framework.response import Response
@@ -16,13 +17,20 @@ from rest_framework.decorators import permission_classes
 from products.models import Product
 from products.serializers import ProductSerializer
 from django.utils.timezone import now
+
 class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
     def get(self, request):
-        categories = Category.objects.all()
-        serializer = CategorySerializer(categories, many=True)
-        return JsonResponse({'categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        categories = Category.objects.get_queryset().order_by('id')
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(categories, request)
+
+        serializer = CategorySerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
         
     @csrf_exempt
     @permission_classes([IsAuthenticated])
@@ -37,10 +45,9 @@ class CategoryAPIView(APIView):
                 is_active= payload["is_active"],
                 description=payload["description"],
                 created_by=user
-                # products=payload["products"].set()
             )
             serializer = CategorySerializer(category)
-            return JsonResponse({'categories': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
+            return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
 
@@ -84,25 +91,50 @@ class CategoryProductsAPIView(APIView):
 
     def get(self, request, category_id):
         products = Product.objects.filter(category=category_id)
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'category products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class CategoryActivatedAPIView(APIView):
     def get(self, request):
         categories = Category.objects.filter(is_active=True)
-        serializer = CategorySerializer(categories, many=True)
-        return JsonResponse({'activated categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(categories, request)
+
+        serializer = CategorySerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class CategoryDeactivatedAPIView(APIView):
 
     def get(self, request):
         categories = Category.objects.filter(is_active=False)
-        serializer = CategorySerializer(categories, many=True)
-        return JsonResponse({'deactivated categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(categories, request)
+
+        serializer = CategorySerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class LatestCategoryAPIView(APIView):
     def get(self, request):
         categories = Category.objects.filter(is_active=True)[0:2]
-        serializer = CategorySerializer(categories, many=True)
-        return JsonResponse({'latest categories': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(categories, request)
+
+        serializer = CategorySerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+

@@ -1,8 +1,9 @@
 from django.db.models import Q
 from django.http import Http404
+from rest_framework.pagination import PageNumberPagination
 
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import  RetrieveUpdateAPIView
 from rest_framework.response import Response
 
 from rest_framework.decorators import api_view, permission_classes
@@ -17,14 +18,19 @@ from .models import Product, Category, Review, Store
 from .serializers import ProductSerializer, ReviewSerializer
 from django.utils.timezone import now
 
-
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer
-
+    
     def get(self, request):
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        products = Product.objects.get_queryset().order_by('id')
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @csrf_exempt
     @permission_classes([IsAuthenticated])
@@ -40,6 +46,7 @@ class ProductAPIView(APIView):
                 price=payload["price"],
                 is_active= payload["is_active"],
                 quantity= payload["quantity"],
+                image= payload["image"],
                 created_by=user,
                 store=Store.objects.get(id=payload['store'])
             )
@@ -53,7 +60,6 @@ class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
 
     def get(self, request, product_id):
         product = Product.objects.get(id=product_id)
-        # print(product.avg_rating)
         serializer = ProductSerializer(product)
         return JsonResponse({'product': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
@@ -87,38 +93,69 @@ class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
 class ProductActivatedAPIView(APIView):
     def get(self, request):
         products = Product.objects.filter(is_active=True)
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'activated products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class ProductDeactivatedAPIView(APIView):
 
     def get(self, request):
         products = Product.objects.filter(is_active=False)
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'deactivated products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class LatestProductAPIView(APIView):
     def get(self, request):
         products = Product.objects.filter(is_active=True)[0:2]
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'latest products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class ProductReviewsAPIView(APIView):
     serializer_class = ReviewSerializer
 
     def get(self, request, product_id):
         reviews = Review.objects.filter(product=product_id)
-        serializer = ReviewSerializer(reviews, many=True)
-        return JsonResponse({'product reviews': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(reviews, request)
+
+        serializer = ReviewSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class ReviewAPIView(APIView):
     serializer_class = ReviewSerializer
-
+    
     def get(self, request):
-        reviews = Review.objects.all()
-        serializer = ReviewSerializer(reviews, many=True)
-        return JsonResponse({'reviews': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        reviews = Review.objects.get_queryset().order_by('id')
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(reviews, request)
+
+        serializer = ReviewSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
 
     @csrf_exempt
     @permission_classes([IsAuthenticated])
@@ -137,6 +174,7 @@ class ReviewAPIView(APIView):
             return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
         except ObjectDoesNotExist as e:
             return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+
 
 class RetrieveDeleteUpdateReviewAPIView(RetrieveUpdateAPIView):
     serializer_class = ReviewSerializer

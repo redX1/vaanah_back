@@ -33,43 +33,16 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.http import HttpResponsePermanentRedirect
 import os
-from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.settings import api_settings
-from rest_framework import viewsets
 
-
-
-class StandardResultsSetPagination(pagination.PageNumberPagination):
-
-    def get_paginated_response(self, data):
-
-        return Response({
-            'links': {
-                'next': self.get_next_link(),
-                'previous': self.get_previous_link()
-            },
-            'current_page': int(self.request.query_params.get('page', 1)),
-            'total': self.page.paginator.count,
-            'per_page': self.page_size,
-            'total_pages': round(self.page.paginator.count/self.page_size, 1),
-            'data': data,
-        })
-class UserAPIView(ListAPIView):
+class UserAPIView(APIView):
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
-    # pagination_class = LimitOffsetPagination
     
     def get(self, request):
-        queryset = User.objects.all()
-        paginator = StandardResultsSetPagination()
-
-        page_size = 5
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(queryset, request)
-
-        serializer = UserSerializer(page, many=True)
-        result = paginator.get_paginated_response(serializer.data)
-        return paginator.get_paginated_response(serializer.data)
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return JsonResponse({'users': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 class CustomRedirect(HttpResponsePermanentRedirect):
 
@@ -142,8 +115,6 @@ class ResendEmailAPI(APIView):
         except Exception:
             return JsonResponse({'code': '500'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
 class VerifyEmail(APIView):
     permission_classes = [AllowAny]
 
@@ -164,7 +135,6 @@ class VerifyEmail(APIView):
         except jwt.exceptions.DecodeError as identifier:
             return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
-          
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)

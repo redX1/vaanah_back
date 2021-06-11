@@ -1,5 +1,6 @@
 from rest_framework.decorators import permission_classes
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import JsonResponse
 from rest_framework.response import Response
@@ -19,11 +20,19 @@ from django.utils.timezone import now
 
 class StoreAPIView(APIView):
     serializer_class = ProductSerializer
-
+    # pagination_class = LimitOffsetPagination
+    
     def get(self, request):
-        stores = Store.objects.all()
-        serializer = StoreSerializer(stores, many=True)
-        return JsonResponse({'stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        stores = Store.objects.get_queryset().order_by('id')
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(stores, request)
+
+        serializer = StoreSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
 
     @permission_classes([IsAuthenticated])
     def post(self, request):
@@ -38,7 +47,7 @@ class StoreAPIView(APIView):
                     is_active= payload["is_active"]
                 )
                 serializer = StoreSerializer(store)
-                return JsonResponse({'stores': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
+                return JsonResponse({'store': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
             except ObjectDoesNotExist as e:
                 return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
@@ -81,29 +90,54 @@ class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
 class StoreProductsAPIView(APIView):
     serializer_class = ProductSerializer
 
+    
     def get(self, request, store_id):
         products = Product.objects.filter(store=store_id)
-        serializer = ProductSerializer(products, many=True)
-        return JsonResponse({'store products': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
 
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    
 
 class StoreActivatedAPIView(APIView):
     def get(self, request):
         stores = Store.objects.filter(is_active=True)
-        serializer = StoreSerializer(stores, many=True)
-        return JsonResponse({'activated stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
 
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(stores, request)
+
+        serializer = StoreSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class StoreDeactivatedAPIView(APIView):
     def get(self, request):
         stores = Store.objects.filter(is_active=False)
-        serializer = StoreSerializer(stores, many=True)
-        return JsonResponse({'deactivated stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(stores, request)
+
+        serializer = StoreSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class LatestStoreAPIView(APIView):
     def get(self, request):
         stores = Store.objects.filter(is_active=True)[0:2]
-        serializer = StoreSerializer(stores, many=True)
-        return JsonResponse({'latest stores': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(stores, request)
+
+        serializer = StoreSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 

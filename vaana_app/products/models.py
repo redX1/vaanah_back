@@ -18,7 +18,7 @@ class Product(TimestampedModel):
     price = models.DecimalField(max_digits=15, decimal_places=3)
     quantity = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    image = models.CharField(max_length=255, default="test")
+    image = models.CharField(max_length=255, default='test')
 
     class Meta:
         ordering = ('name',)
@@ -53,7 +53,7 @@ class Review(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     comment = models.TextField()
-    rating = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
+    rating = models.IntegerField(default=0)
     product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 

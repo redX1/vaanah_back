@@ -36,7 +36,6 @@ import os
 from rest_framework.settings import api_settings
 
 
-
 class UserAPIView(APIView):
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer

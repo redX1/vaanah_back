@@ -46,6 +46,7 @@ class ProductAPIView(APIView):
                 price=payload["price"],
                 is_active= payload["is_active"],
                 quantity= payload["quantity"],
+                image= payload["image"],
                 created_by=user,
                 store=Store.objects.get(id=payload['store'])
             )

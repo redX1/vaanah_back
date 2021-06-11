@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    url(r'^users/?$', UserRetrieveUpdateAPIView.as_view()),
+    url(r'^users/?$', UserRetrieveUpdateAPIView.as_view() ),
     url(r'^users/register/?$', RegistrationAPIView.as_view()),
     url(r'^users/login/?$', LoginAPIView.as_view()),
     path('users/verify/', VerifyEmail.as_view(), name="email-verify"),
@@ -18,7 +18,6 @@ urlpatterns = [
     path('users/password/reset/', RequestPasswordResetEmail.as_view(), name="request-reset-email"),
     path('users/password/reset/<uidb64>/<token>/', PasswordTokenCheckAPI.as_view(), name='password-reset-confirm'),
     path('users/password/reset/complete/', SetNewPasswordAPIView.as_view(), name='password-reset-complete'),
-    
     
     path('users/<int:user_id>/stores', UserStoreAPIView.as_view()),
     path('users/all', UserAPIView.as_view()),

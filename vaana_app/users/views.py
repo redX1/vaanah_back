@@ -1,9 +1,15 @@
+from collections import OrderedDict
+from django.core.exceptions import ObjectDoesNotExist
+from django.http.response import JsonResponse
+from rest_framework import pagination
+from stores.models import Store
+from stores.serializers import StoreSerializer
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,6 +33,43 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.http import HttpResponsePermanentRedirect
 import os
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
+from rest_framework.settings import api_settings
+from rest_framework import viewsets
+
+
+
+class StandardResultsSetPagination(pagination.PageNumberPagination):
+
+    def get_paginated_response(self, data):
+
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'current_page': int(self.request.query_params.get('page', 1)),
+            'total': self.page.paginator.count,
+            'per_page': self.page_size,
+            'total_pages': round(self.page.paginator.count/self.page_size, 1),
+            'data': data,
+        })
+class UserAPIView(ListAPIView):
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = UserSerializer
+    # pagination_class = LimitOffsetPagination
+    
+    def get(self, request):
+        queryset = User.objects.all()
+        paginator = StandardResultsSetPagination()
+
+        page_size = 5
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(queryset, request)
+
+        serializer = UserSerializer(page, many=True)
+        result = paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
 class CustomRedirect(HttpResponsePermanentRedirect):
 
@@ -57,12 +100,14 @@ class RegistrationAPIView(APIView):
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         token = RefreshToken.for_user(user).access_token
+        email = user.email
+
         # token = user_data['token']
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
-        absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-        email_body = 'Hi '+user.username + \
-            ' Use the link below to verify your email \n' + absurl
+        #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ "&email="+ email
+        absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email        
+        email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
@@ -70,24 +115,56 @@ class RegistrationAPIView(APIView):
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
+class ResendEmailAPI(APIView):
+    serializer_class = ResetPasswordEmailRequestSerializer
+
+    def post (self, request):
+        user = json.loads(request.body)
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            email = serializer.data['email']
+            user = User.objects.get(email=email)
+            token = RefreshToken.for_user(user).access_token
+            current_site = get_current_site(request).domain
+            relativeLink = reverse('email-resend')
+
+            #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
+            absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
+            email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
+            data = {'email_body': email_body, 'to_email': user.email,
+                'email_subject': 'Verify your email'}
+            Util.send_email(data)
+            return Response({'code': '200'} , status=status.HTTP_200_OK)
+        except ObjectDoesNotExist as e:
+            return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return JsonResponse({'code': '500'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 class VerifyEmail(APIView):
     permission_classes = [AllowAny]
-    serializer_class = EmailVerificationSerializer
-   
+
     def get(self, request):
         token = request.GET.get('token')
+        #email = re
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
             user = User.objects.get(id=payload['user_id'])
+            # print(payload['user'])
+
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
-            return Response({'Account successfully activated'}, status=status.HTTP_200_OK)
+            return JsonResponse({'code': '200'}, status=status.HTTP_200_OK)
         except jwt.ExpiredSignatureError as identifier:
-            return Response({'error': 'Activation expired'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError as identifier:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
+          
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
@@ -174,13 +251,16 @@ class RequestPasswordResetEmail(APIView):
             relativeLink = reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
 
             redirect_url = request.data.get('redirect_url', '')
-            absurl = 'http://'+current_site + relativeLink
-            email_body = 'Hello, \n Use link below to reset your password  \n' + \
+            #absurl = 'http://'+current_site + relativeLink
+            absurl = 'http://localhost:4200' + relativeLink
+            email_body = 'Hello, \nUse link below to reset your password  \n' + \
                 absurl+"?redirect_url="+redirect_url
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Reset your passsword'}
             Util.send_email(data)
-        return Response({'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+            return Response({'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'Your are not a user please register !'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PasswordTokenCheckAPI(APIView):
@@ -199,8 +279,8 @@ class PasswordTokenCheckAPI(APIView):
 
             return Response({'success': True, 'message': 'Credentials valid', 'uidb64': uidb64, 'token': token}, status=status.HTTP_200_OK)
         except DjangoUnicodeDecodeError as identifier:
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_400_BAD_REQUEST)
+            #if not PasswordResetTokenGenerator().check_token(user, token):
+            return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -213,3 +293,10 @@ class SetNewPasswordAPIView(APIView):
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
 
 
+class UserStoreAPIView(APIView):
+    serializer_class = StoreSerializer
+
+    def get(self, request, user_id):
+        stores = Store.objects.filter(created_by=user_id)
+        serializer = StoreSerializer(stores, many=True)
+        return JsonResponse({'user stores': serializer.data}, safe=False, status=status.HTTP_200_OK)

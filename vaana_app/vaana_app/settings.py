@@ -63,6 +63,9 @@ INSTALLED_APPS = [
     'carts',
     'orders',
     'addresses',
+    'emails',
+    'countries',
+
 ]
 
 MIDDLEWARE = [
@@ -106,10 +109,14 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+<<<<<<< HEAD
         'NAME': 'vaanahdb',
+=======
+        'NAME': 'postgres',
+>>>>>>> fdac4c87e90e5dec7a52cb9df35c28aa3a3149c3
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': '3.122.225.2',
+        'HOST': '18.156.60.171',
         'PORT': '5433',
     }
 }
@@ -171,7 +178,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-
+APPEND_SLASH=False
 # Tell Django about the custom `User` model we created. The string
 # `authentication.User` tells Django we are referring to the `User` model in
 # the `authentication` module. This module is registered above in a setting

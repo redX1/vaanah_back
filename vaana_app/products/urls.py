@@ -11,7 +11,7 @@ urlpatterns = [
     path('products/deactivated', views.ProductDeactivatedAPIView.as_view()),
     path('products/latest', views.LatestProductAPIView.as_view()),
 
-    path('reviews', views.ReviewAPIView.as_view()),
-    path('reviews/<uuid:review_id>', views.RetrieveDeleteUpdateReviewAPIView.as_view()),
+    path('products/reviews', views.ReviewAPIView.as_view()),
+    path('products/reviews/<uuid:review_id>', views.RetrieveDeleteUpdateReviewAPIView.as_view()),
 
 ]

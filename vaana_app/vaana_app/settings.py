@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+import datetime  
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +30,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
+# smtp email configuration
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.ionos.de'
+EMAIL_HOST_USER = 'test.vaanah@kaeyros-analytics.de'
+EMAIL_HOST_PASSWORD = '$Happy.Vaanah$'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Application definition
 
@@ -54,7 +63,9 @@ INSTALLED_APPS = [
     'carts',
     'orders',
     'addresses',
+    'emails',
     'countries',
+
 ]
 
 MIDDLEWARE = [
@@ -98,10 +109,14 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vaanahdb2',
+<<<<<<< HEAD
+        'NAME': 'vaanahdb',
+=======
+        'NAME': 'postgres',
+>>>>>>> fdac4c87e90e5dec7a52cb9df35c28aa3a3149c3
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': '3.122.225.2',
+        'HOST': '18.156.60.171',
         'PORT': '5433',
     }
 }
@@ -163,6 +178,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
+APPEND_SLASH=False
 # Tell Django about the custom `User` model we created. The string
 # `authentication.User` tells Django we are referring to the `User` model in
 # the `authentication` module. This module is registered above in a setting

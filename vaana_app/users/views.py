@@ -62,7 +62,7 @@ class RegistrationAPIView(APIView):
         tags=['Users'],
     )
     def post(self, request):
-        user = json.loads(request.body)
+        user = request.data
 
         # The create serializer, validate serializer, save serializer pattern
         # below is common and you will see it a lot throughout this course and
@@ -80,7 +80,7 @@ class RegistrationAPIView(APIView):
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
         #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ "&email="+ email
-        absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email        
+        absurl = 'http://18.193.203.105:8083/email/verify/'+"?token="+str(token)+ "&email="+email        
         email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
@@ -105,7 +105,7 @@ class ResendEmailAPI(APIView):
             relativeLink = reverse('email-resend')
 
             #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
-            absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
+            absurl = 'http://18.193.203.105:8083/email/verify/'+"?token="+str(token)+ "&email="+email
             email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
@@ -223,7 +223,7 @@ class RequestPasswordResetEmail(APIView):
 
             redirect_url = request.data.get('redirect_url', '')
             #absurl = 'http://'+current_site + relativeLink
-            absurl = 'http://localhost:4200' + relativeLink
+            absurl = 'http://18.193.203.105:8083' + relativeLink
             email_body = 'Hello, \nUse link below to reset your password  \n' + \
                 absurl+"?redirect_url="+redirect_url
             data = {'email_body': email_body, 'to_email': user.email,

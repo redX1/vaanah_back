@@ -9,10 +9,6 @@ class RecursiveField(serializers.Serializer):
         serializer = self.parent.parent.__class__(value, context=self.context)
         return serializer.data
 
-class SubCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
 class CategorySerializer(serializers.ModelSerializer):
     products = ProductSerializer(many=True)
     children = RecursiveField(many=True,allow_null=True)

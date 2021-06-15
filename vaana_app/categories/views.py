@@ -22,7 +22,7 @@ class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
     def get(self, request):
-        categories = Category.objects.get_queryset().order_by('id')
+        categories = Category.objects.exclude(parent__isnull=False)
         paginator = PageNumberPagination()
 
         page_size = 20
@@ -44,6 +44,7 @@ class CategoryAPIView(APIView):
                 slug=payload["slug"],
                 is_active= payload["is_active"],
                 description=payload["description"],
+                # parent=Category.objects.get(name=payload['parent']),
                 created_by=user
             )
             serializer = CategorySerializer(category)

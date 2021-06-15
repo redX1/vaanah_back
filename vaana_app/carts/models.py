@@ -10,7 +10,7 @@ class CartItem(TimestampedModel):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=1) 
 
 
 class Cart(TimestampedModel):

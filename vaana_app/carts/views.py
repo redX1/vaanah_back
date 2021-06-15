@@ -123,6 +123,7 @@ class CartItemView(APIView):
                     cart = Cart.objects.create(owner=user, status = Cart.OPEN)
 
                 item = CartItem.objects.create(product=product, quantity=payload['quantity'])
+                
                 cart.items.add(item)
 
                 response['body'] = CartSerializer(cart).data

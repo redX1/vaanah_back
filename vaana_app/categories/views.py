@@ -44,7 +44,7 @@ class CategoryAPIView(APIView):
                 slug=payload["slug"],
                 is_active= payload["is_active"],
                 description=payload["description"],
-                # parent=Category.objects.get(name=payload['parent']),
+                parent=Category.objects.get(name=payload['parent']),
                 created_by=user
             )
             serializer = CategorySerializer(category)

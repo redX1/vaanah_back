@@ -39,7 +39,7 @@ class CategoryTest(TestCase):
         self.assertEqual(self.category.name, 'new name')
 
 
-    def test_no_categories(self):
-        response = self.client.get(reverse('categories'), format='json')
-        self.assertEqual(response.data, {'categories': []})
+    # def test_no_categories(self):
+    #     response = self.client.get(reverse('categories'), format='json')
+    #     self.assertEqual(response.data, {'categories': []})
 

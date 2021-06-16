@@ -10,8 +10,8 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     url(r'^users/?$', UserRetrieveUpdateAPIView.as_view() ),
-    url(r'^users/register/?$', RegistrationAPIView.as_view()),
-    url(r'^users/login/?$', LoginAPIView.as_view()),
+    url(r'^users/register/?$', RegistrationAPIView.as_view(), name="register"),
+    url(r'^users/login/?$', LoginAPIView.as_view(), name="login"),
     path('users/verify/', VerifyEmail.as_view(), name="email-verify"),
     path('users/resend/', ResendEmailAPI.as_view(), name="email-resend"),
     path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

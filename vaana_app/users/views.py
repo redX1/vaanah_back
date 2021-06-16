@@ -34,6 +34,8 @@ from drf_yasg.utils import swagger_auto_schema
 from django.http import HttpResponsePermanentRedirect
 import os
 from rest_framework.settings import api_settings
+from addresses.serializers import AddressSerializer
+from addresses.models import Address
 
 
 class UserAPIView(APIView):
@@ -54,6 +56,7 @@ class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
+    addressSerializer = AddressSerializer
 
     @swagger_auto_schema(
         operation_description="apiview post description override",
@@ -69,10 +72,16 @@ class RegistrationAPIView(APIView):
         # your own work later on. Get familiar with it.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
+        address_data = user['address']
+        address = Address.objects.create(country=address_data['country'], state=address_data['state'], street=address_data['street'], zipcode=address_data['zipcode'])
+        user = User.objects.create_user(username=user['username'], email=user['email'], password=user['password'], address=address)
+        """ addressSerializer = self.addressSerializer(data=address)
+        addressSerializer.is_valid(raise_exception=True)
+        serializer.data.address = addressSerializer.data
         serializer.save()
 
         user_data = serializer.data
-        user = User.objects.get(email=user_data['email'])
+        user = User.objects.get(email=user_data['email']) """
         token = RefreshToken.for_user(user).access_token
         email = user.email
 
@@ -87,7 +96,7 @@ class RegistrationAPIView(APIView):
 
         Util.send_email(data)
 
-        return Response(user_data, status=status.HTTP_201_CREATED)
+        return Response(RegistrationSerializer(user).data, status=status.HTTP_201_CREATED)
 
 class ResendEmailAPI(APIView):
     serializer_class = ResetPasswordEmailRequestSerializer

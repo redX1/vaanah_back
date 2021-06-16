@@ -19,8 +19,9 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('state', models.CharField(max_length=255)),
-                ('postcode', models.CharField(blank=True, max_length=64)),
+                ('zipcode', models.CharField(blank=True, max_length=64)),
                 ('country', models.CharField(max_length=255)),
+                ('street', models.CharField(max_length=255)),
             ],
             options={
                 'ordering': ['-created_at', '-updated_at'],

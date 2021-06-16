@@ -9,6 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.utils.encoding import smart_str, force_str
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from addresses.serializers import AddressSerializer
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
@@ -26,11 +27,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=255, read_only=True)
 
     tokens = serializers.SerializerMethodField()
+    address = AddressSerializer()
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ('email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'tokens')
+        fields = ('email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'tokens', 'address')
 
     
     def get_tokens(self, user):
@@ -119,7 +121,7 @@ class LoginSerializer(serializers.Serializer):
             'token': user.token,
             'account_type': user.account_type, 
             'gender':user.gender,
-            # 'address':user.address,
+            'address':user.address,
         }
 
 
@@ -128,6 +130,7 @@ class UserSerializer(serializers.ModelSerializer):
        
     account_type = serializers.CharField()
     gender = serializers.CharField()
+    address = AddressSerializer()
 
     # Passwords must be at least 8 characters, but no more than 128
     # characters. These values are the default provided by Django. We could
@@ -142,8 +145,15 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender'
-        )
+            'email', 
+            'username', 
+            'password', 
+            'token', 
+            'is_verified', 
+            'account_type', 
+            'gender',
+            'address'
+        ) 
 
         # The `read_only_fields` option is an alternative for explicitly
         # specifying the field with `read_only=True` like we did for password

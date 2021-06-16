@@ -10,6 +10,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from cores.models import TimestampedModel
+from addresses.models import Address
 import uuid
 
 
@@ -100,6 +101,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     
     account_type = models.CharField(max_length=20, default='Customer')
     gender = models.CharField(max_length=20, default='M')
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True)
 
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.

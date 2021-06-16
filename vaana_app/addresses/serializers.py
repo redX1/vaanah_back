@@ -9,5 +9,6 @@ class AddressSerializer(serializers.ModelSerializer):
             "id",
             "country",
             "state",
-            "postcode"
+            "street",
+            "zipcode",
         ]

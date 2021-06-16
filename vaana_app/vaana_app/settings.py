@@ -112,7 +112,7 @@ DATABASES = {
         'NAME': 'vaanafatma',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': '18.156.60.171',
+        'HOST': 'localhost',
         'PORT': '5433',
     }
 }

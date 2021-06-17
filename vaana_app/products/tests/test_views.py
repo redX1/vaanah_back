@@ -1,32 +1,36 @@
 from django.urls.base import reverse
 from ..models import Product
 from users.models import User
+from stores.models import Store
 from categories.models import Category
+
 from django.test import TestCase
 import uuid
 
 class ProductTest(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create(username='user', email='email@im.com', password='test')
+        self.user = User.objects.create(username='laye', email='abdoulaye.ndao@xegit.com', password='Passer123')
         self.user.save()
-        self.product = Product.objects.create(
-            id = uuid.uuid4,
+        self.product = Product(
             name = "Foods",
             slug = "foods",
             description = "Lorem ipsum dolor, sit amet consectetur adipisicing elit.",
             is_active = "True",
-            created_by = User.objects.create(username='user', email='email@im.com', password='test'),
+            created_by = self.user,
             price = "200",
-            category = Product.objects.create(
-                id = uuid.uuid4,
+            category = Category.objects.create(
                 name = "Foods",
                 slug = "foods",
                 description = "Lorem ipsum dolor, sit amet consectetur adipisicing elit.",
                 is_active = "True",
-                created_by = User.objects.create(username='user', email='email@im.com', password='test')
+                created_by = self.user
             ),
-            # store = "",
+            store = Store.objects.create(name = "Shop",
+                            created_by = self.user,
+                            store_address = "Lorem ipsum ",
+                            is_active = "True"
+                        ),
             image = "test",
             quantity ="50"
         )
@@ -51,7 +55,7 @@ class ProductTest(TestCase):
     def test_update_product_name(self):
         self.product.name = 'new name'
         self.product.save()
-        self.assertEqual(self.category.name, 'new name')
+        self.assertEqual(self.product.name, 'new name')
 
 
     # def test_no_products(self):

@@ -7,14 +7,14 @@ from django.test import TestCase
 class CategoryTest(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create(username='user', email='email@im.com', password='test')
+        self.user = User.objects.create(username='laye', email='abdoulaye.ndao@xegit.com', password='Passer123')
         self.user.save()
         self.category = Category(name = "Foods",
                                     slug = "foods",
                                     description = "Lorem ipsum dolor, sit amet consectetur adipisicing elit.",
                                     is_active = "True",
                                     created_by = self.user
-                                )
+                        )
         self.category.save()
 
     def tearDown(self):

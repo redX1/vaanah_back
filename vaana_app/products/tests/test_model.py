@@ -13,7 +13,7 @@ class ProductModelTest(TestCase):
             slug = "foods",
             description = "Lorem ipsum dolor, sit amet consectetur adipisicing elit.",
             is_active = "True",
-            created_by = User.objects.create(username='user', email='email@im.com', password='test'),
+            created_by = User.objects.create(username='user1', email='email1@im.com', password='test'),
             price = "200",
             category = Category.objects.create(
                 id = uuid.uuid4,
@@ -21,7 +21,7 @@ class ProductModelTest(TestCase):
                 slug = "foods",
                 description = "Lorem ipsum dolor, sit amet consectetur adipisicing elit.",
                 is_active = "True",
-                created_by = User.objects.create(username='user', email='email@im.com', password='test')
+                created_by = User.objects.create(username='user0', email='email0@im.com', password='test')
             ),
             # store = "",
             image = "test",

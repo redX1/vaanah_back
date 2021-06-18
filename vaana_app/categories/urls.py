@@ -4,6 +4,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('allcategories', views.AllCategoryAPIView.as_view()),
     path('categories', views.CategoryAPIView.as_view(), name='categories'),
     path('categories/<uuid:category_id>', views.RetrieveDeleteUpdateCategoryAPIView.as_view()),
     path('categories/<uuid:category_id>/products', views.CategoryProductsAPIView.as_view(), name='products-category'),

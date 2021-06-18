@@ -74,7 +74,7 @@ class RegistrationAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         address_data = user['address']
         address = Address.objects.create(country=address_data['country'], state=address_data['state'], street=address_data['street'], zipcode=address_data['zipcode'])
-        user = User.objects.create_user(username=user['username'], email=user['email'], password=user['password'], address=address)
+        user = User.objects.create_user(username=user['username'], email=user['email'], password=user['password'], account_type=user['account_type'], gender=user['gender'], address=address)
         """ addressSerializer = self.addressSerializer(data=address)
         addressSerializer.is_valid(raise_exception=True)
         serializer.data.address = addressSerializer.data
@@ -89,7 +89,7 @@ class RegistrationAPIView(APIView):
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
         #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ "&email="+ email
-        absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email        
+        absurl = 'http://18.156.60.171:8000/email/verify/'+"?token="+str(token)+ "&email="+email        
         email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
@@ -114,7 +114,7 @@ class ResendEmailAPI(APIView):
             relativeLink = reverse('email-resend')
 
             #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
-            absurl = 'http://localhost:4200/email/verify/'+"?token="+str(token)+ "&email="+email
+            absurl = 'http://18.156.60.171:8000/email/verify/'+"?token="+str(token)+ "&email="+email
             email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}

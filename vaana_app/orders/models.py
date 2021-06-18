@@ -4,6 +4,7 @@ from cores.models import TimestampedModel
 import uuid
 from carts.models import Cart
 from addresses.models import Address
+from shippings.models import ShippingMethod
 
 class ShippingAddress(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -32,7 +33,7 @@ class Order(TimestampedModel):
     )
     shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.CASCADE)
     
-    shipping_method = models.CharField(max_length=128, blank=True)
+    shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
 
     # Use this field to indicate that an order is on hold / awaiting payment
     status = models.CharField(max_length=100, blank=True)

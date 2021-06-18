@@ -101,7 +101,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     
     account_type = models.CharField(max_length=20, default='Customer')
     gender = models.CharField(max_length=20, default='M')
-    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
 
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.

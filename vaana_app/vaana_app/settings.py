@@ -183,3 +183,5 @@ APPEND_SLASH=False
 AUTH_USER_MODEL = 'users.User'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+FRONT_URL = 'http://18.193.203.105:8083'

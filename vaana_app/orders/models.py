@@ -27,7 +27,11 @@ class Order(TimestampedModel):
     shipping_tax = models.DecimalField(decimal_places=2, max_digits=12)
     total_prices = models.DecimalField(decimal_places=2, max_digits=12)
 
+    INITIATED, CONFIRMED, SHIPPING, DELIVERED, CANCELED = (
+        "initiated", "confirmed", "shipping", "delivered", "canceled"
+    )
     shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.CASCADE)
+    
     shipping_method = models.CharField(max_length=128, blank=True)
 
     # Use this field to indicate that an order is on hold / awaiting payment

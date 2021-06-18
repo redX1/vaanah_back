@@ -18,6 +18,14 @@ from products.models import Product
 from products.serializers import ProductSerializer
 from django.utils.timezone import now
 
+class AllCategoryAPIView(APIView):
+    serializer_class = CategorySerializer
+    
+    def get(self, request):
+        category = Category.objects.all()
+        serializer = CategorySerializer(category, many=True)
+        return Response(serializer.data)
+        
 class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
@@ -44,7 +52,7 @@ class CategoryAPIView(APIView):
                 slug=payload["slug"],
                 is_active= payload["is_active"],
                 description=payload["description"],
-                # parent=Category.objects.get(name=payload['parent']),
+                parent=Category.objects.get(name=payload['parent']),
                 created_by=user
             )
             serializer = CategorySerializer(category)

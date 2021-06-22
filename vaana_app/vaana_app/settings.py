@@ -115,8 +115,8 @@ DATABASES = {
         'NAME': 'vaanahdb',
         'USER': 'vaanah_user',
         'PASSWORD': 'secret',
-        'HOST': '18.156.60.171',
-        'PORT': '5434',
+        'HOST': 'localhost',
+        'PORT': '5433',
     }
 }
 

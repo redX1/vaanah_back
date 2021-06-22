@@ -133,7 +133,40 @@ class CartItemView(APIView):
 
 
 class CartItemUpdateView(RetrieveUpdateAPIView):
-        
+
+        @permission_classes([IsAuthenticated])
+        def update(self, request, id):
+            user = request.user
+            payload = json.loads(request.body)
+            serializer = CartItemSerializer(data=payload)
+            serializer.is_valid(raise_exception=True)
+
+            product = Product.objects.get(id=payload['product'])
+            quantity = payload['quantity']
+            response = {
+                'body': {
+                    'error': 'quantity not allowed'
+                },
+                'status': status.HTTP_400_BAD_REQUEST
+            }
+            if product.quantity > quantity:
+                try:
+                    cart = Cart.objects.get(owner=user, status = Cart.OPEN)
+                    try:
+                        cart_item = CartItem.objects.get(id=id)
+                        cart_item.quantity = quantity
+                        cart_item.save()
+                        response['body'] = CartSerializer(cart).data
+                        response['status'] = status.HTTP_200_OK
+                    except ObjectDoesNotExist as e:
+                        response['body']['error'] = 'Item not founded'
+                        response['status'] = status.HTTP_404_NOT_FOUND
+                except ObjectDoesNotExist as e:
+                    response['body']['error'] = 'Any opened cart founded'
+                    response['status'] = status.HTTP_400_BAD_REQUEST
+
+            return JsonResponse(response['body'], status = response['status'], safe=False)
+
         @csrf_exempt
         @permission_classes([IsAuthenticated])
         def delete(self, request, id):
@@ -165,4 +198,4 @@ class CartItemUpdateView(RetrieveUpdateAPIView):
                     'status': status.HTTP_404_NOT_FOUND
                 }
 
-            return JsonResponse(response['body'], status = response['status'])
+            return JsonResponse(response['body'], status = response['status'], safe=False)

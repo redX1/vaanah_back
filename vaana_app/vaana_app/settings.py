@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'emails',
     'countries',
     'django_seed',
+    'shippings',
 
 ]
 

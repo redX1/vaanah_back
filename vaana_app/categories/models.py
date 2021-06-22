@@ -12,6 +12,8 @@ class Category(TimestampedModel):
     parent      = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    image = models.CharField(max_length=255, default='test')
 
 
     class Meta:

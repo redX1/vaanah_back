@@ -1,3 +1,4 @@
+from random import choices
 from django.conf import settings
 from django.db import models
 from cores.models import TimestampedModel
@@ -14,7 +15,7 @@ class ShippingAddress(TimestampedModel):
 
 class Order(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    number = models.CharField(max_length=128, db_index=True, unique=True)
+    number = models.CharField(max_length=128, db_index=True, unique=True, blank=True)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -31,9 +32,16 @@ class Order(TimestampedModel):
     INITIATED, CONFIRMED, SHIPPING, DELIVERED, CANCELED = (
         "initiated", "confirmed", "shipping", "delivered", "canceled"
     )
+    STATUS = [
+        (INITIATED, 'initiated'), 
+        (CONFIRMED, "confirmed"), 
+        (SHIPPING, "shipping"), 
+        (DELIVERED, "delivered"), 
+        (CANCELED, "canceled")
+        ]
     shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.CASCADE)
     
     shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
 
     # Use this field to indicate that an order is on hold / awaiting payment
-    status = models.CharField(max_length=100, blank=True)
+    status = models.CharField(max_length=100, default=INITIATED, choices=STATUS)

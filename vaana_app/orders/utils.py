@@ -11,3 +11,4 @@ class Util:
         rand_str = ''.join(random.choice(letters) for i in range(3))
 
         return strn + rand_nb +rand_str
+

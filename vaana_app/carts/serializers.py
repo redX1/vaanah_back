@@ -8,6 +8,8 @@ class CartItemSerializer(serializers.ModelSerializer):
             "id",
             "product",
             "quantity",
+            "created_at",
+            "updated_at",
         ]
 
 
@@ -21,5 +23,7 @@ class CartSerializer(serializers.ModelSerializer):
             "status",
             "merged_date",
             "items",
+            "created_at",
+            "updated_at",
         ]
 

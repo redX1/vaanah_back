@@ -16,7 +16,7 @@ class ShippingAddress(TimestampedModel):
 class Order(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     number = models.CharField(max_length=128, db_index=True, unique=True, blank=True)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,

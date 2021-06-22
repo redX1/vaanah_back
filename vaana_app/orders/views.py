@@ -1,3 +1,5 @@
+from rest_framework import serializers
+from rest_framework.serializers import Serializer
 from shippings.models import ShippingMethod
 from addresses.models import Address
 from carts.models import Cart
@@ -64,3 +66,14 @@ class InitiateOrderApiView(APIView):
                 'status': status.HTTP_500_INTERNAL_SERVER_ERROR
             }
         return JsonResponse(response['body'], status=response['status'], safe=False)
+
+class GetOrdersAPIView(APIView):
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        orders = Order.objects.filter(user=user)
+        serializer = OrderSerializer(orders, many=True)
+
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)

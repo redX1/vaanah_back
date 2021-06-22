@@ -14,7 +14,9 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
             "id",
             "phone_number",
             "notes",
-            "address"
+            "address",
+            "created_at",
+            "updated_at",
         ]
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -33,7 +35,9 @@ class OrderSerializer(serializers.ModelSerializer):
             "total_prices",
             "shipping_address",
             "shipping_method",
-            "status"
+            "status",
+            "created_at",
+            "updated_at",
         ]
 
     def verify(self, fields):

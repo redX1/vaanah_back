@@ -18,11 +18,19 @@ from products.models import Product
 from products.serializers import ProductSerializer
 from django.utils.timezone import now
 
+class AllCategoryAPIView(APIView):
+    serializer_class = CategorySerializer
+    
+    def get(self, request):
+        category = Category.objects.all()
+        serializer = CategorySerializer(category, many=True)
+        return Response(serializer.data)
+        
 class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
     
     def get(self, request):
-        categories = Category.objects.exclude(parent__isnull=False)
+        categories = Category.objects.get_queryset().order_by('id')
         paginator = PageNumberPagination()
 
         page_size = 20

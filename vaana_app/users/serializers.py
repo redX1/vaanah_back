@@ -26,21 +26,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
 
-    tokens = serializers.SerializerMethodField()
     address = AddressSerializer()
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ('email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'tokens', 'address')
-
-    
-    def get_tokens(self, user):
-        refresh = RefreshToken.for_user(user)
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
+        fields = ('email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'address')
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.

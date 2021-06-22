@@ -1,3 +1,4 @@
+from os import name
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -18,13 +19,6 @@ from products.models import Product
 from products.serializers import ProductSerializer
 from django.utils.timezone import now
 
-class AllCategoryAPIView(APIView):
-    serializer_class = CategorySerializer
-    
-    def get(self, request):
-        category = Category.objects.all()
-        serializer = CategorySerializer(category, many=True)
-        return Response(serializer.data)
         
 class CategoryAPIView(APIView):
     serializer_class = CategorySerializer
@@ -45,20 +39,22 @@ class CategoryAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        
-        try:
-            category = Category.objects.create(
-                name=payload["name"],
-                slug=payload["slug"],
-                is_active= payload["is_active"],
-                description=payload["description"],
-                parent=Category.objects.get(name=payload['parent']),
-                created_by=user
-            )
-            serializer = CategorySerializer(category)
-            return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
-        except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+        if user.is_superuser == True:
+            try:
+                category = Category.objects.create(
+                    name=payload["name"],
+                    slug=payload["slug"],
+                    is_active= payload["is_active"],
+                    description=payload["description"],
+                    # parent=Category.objects.get(name=payload['parent']),
+                    created_by=user
+                )
+                serializer = CategorySerializer(category)
+                return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
+            except ObjectDoesNotExist as e:
+                return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return JsonResponse({'error':'You are not a superuser !'}, status=status.HTTP_403_FORBIDDEN)
 
 class RetrieveDeleteUpdateCategoryAPIView(RetrieveUpdateAPIView):
     serializer_class = CategorySerializer

@@ -17,7 +17,6 @@ from products.serializers import ProductSerializer
 from rest_framework.views import APIView
 from django.utils.timezone import now
 
-
 class StoreAPIView(APIView):
     serializer_class = ProductSerializer
     # pagination_class = LimitOffsetPagination

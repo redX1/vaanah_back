@@ -1,25 +1,25 @@
-
+from .models import Email
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
-
-from users.models import User
-from django.utils.encoding import  force_str
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-
+from django.core.mail import send_mail
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
-    token = serializers.CharField(max_length=555)
-
     class Meta:
-        model = User
-        fields = ['token']
+        model = Email
+        fields = [
+            'email',
+            "mail_to",
+            "subject",
+            "body",
+        ]
 
-class ResetPasswordEmailRequestSerializer(serializers.Serializer):
-    email = serializers.EmailField(min_length=2)
-
-    redirect_url = serializers.CharField(max_length=500, required=False)
-
-    class Meta:
-        fields = ['email']
+    # def create(self, validate_data):
+    #     instance = super(EmailVerificationSerializer, self).create(validate_data)
+    #     send_mail(
+    #         'Instance {} has been created'.format(instance.pk),
+    #         'Here is the message. DATA: {}'.format(validate_data),
+    #         'from@example.com',
+    #         ['to@example.com'],
+    #         fail_silently=False,
+    #     )
+    #     return instance
 

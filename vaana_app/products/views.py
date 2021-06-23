@@ -37,8 +37,9 @@ class ProductAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        try:
-            product = Product.objects.create(
+        if user.account_type == 'Seller' or user.account_type == 'SELLER':
+            try:
+                product = Product.objects.create(
                 category=Category.objects.get(id=payload['category']),
                 name=payload["name"],
                 slug=payload["slug"],
@@ -49,11 +50,14 @@ class ProductAPIView(APIView):
                 image= payload["image"],
                 created_by=user,
                 store=Store.objects.get(id=payload['store'])
-            )
-            serializer = ProductSerializer(product)
-            return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
-        except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+                )
+                serializer = ProductSerializer(product)
+                return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
+            except ObjectDoesNotExist as e:
+                return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return JsonResponse({'error':'You are not a Seller !'}, status=status.HTTP_403_FORBIDDEN)
+        
 
 class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
     serializer_class = ProductSerializer

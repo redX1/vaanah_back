@@ -18,6 +18,7 @@ class CategorySerializer(serializers.ModelSerializer):
             "slug",
             "description",
             "parent",
+            "image",
             "is_active",
             "created_by",
             "created_at",

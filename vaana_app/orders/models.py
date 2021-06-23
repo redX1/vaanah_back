@@ -24,7 +24,7 @@ class Order(TimestampedModel):
         on_delete=models.SET_NULL
     )
     
-    currency = models.CharField(max_length=12)
+    currency = models.CharField(max_length=12, default='EUR')
     total_tax = models.DecimalField(decimal_places=2, max_digits=12)
     shipping_tax = models.DecimalField(decimal_places=2, max_digits=12)
     total_prices = models.DecimalField(decimal_places=2, max_digits=12)

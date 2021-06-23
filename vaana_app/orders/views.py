@@ -34,7 +34,7 @@ class InitiateOrderApiView(APIView):
         shipping_method_data = data['shipping_method']
 
         try:
-            cart = Cart.objects.get(id=data['cart'])
+            cart = Cart.objects.get(id=data['cart'], status=Cart.OPEN)
             address = Address.objects.create(country=address_data["country"], state=address_data['state'], street=address_data['street'], zipcode=address_data['zipcode'])
             shipping_address = ShippingAddress.objects.create(address=address, phone_number=shipping_address_data['phone_number'], notes=shipping_address_data['notes'])
             shipping_method = ShippingMethod.objects.create(name=shipping_method_data['name'], price=shipping_method_data['price'], currency=shipping_method_data['currency'])
@@ -51,7 +51,7 @@ class InitiateOrderApiView(APIView):
                 )
             cart.status = Cart.SUBMITTED
             cart.save()
-            email_data = {'email_body': 'Your order ' + order.number + ' has initiated, you can pay to confirm your order.', 'to_email': user.email,
+            email_data = {'email_body': 'Your order ' + order.number + ' has been initiated, you can pay to confirm your order.', 'to_email': user.email,
                 'email_subject': 'Order initiated'}
             send_email(email_data)
             response = {

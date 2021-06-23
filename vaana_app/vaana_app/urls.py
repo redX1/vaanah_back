@@ -52,7 +52,8 @@ urlpatterns = [
 
     path('api/', include('countries.urls'), name='countries'),
 
-    path('api/', include('orders.urls'), name='orders')
+    path('api/', include('orders.urls'), name='orders'),
 
+    path('api/', include('payments.urls'), name='payments'),
 
 ]

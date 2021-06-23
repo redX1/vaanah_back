@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'countries',
     'django_seed',
     'shippings',
+    'payments'
 
 ]
 
@@ -186,3 +187,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 FRONT_URL = 'http://18.193.203.105:8083'
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51HQ3ZXFunRLoLWctiy0l6VVOeflU8ES2IRjTyY7LL9rEpKedBIfOfKB1BSSftQk4Qmke8HdtRcdmje7R2whuWgTz00U7HXpwjn'
+STRIPE_SECRET_KEY = 'sk_test_51HQ3ZXFunRLoLWctxxpIKhYLudKWPCFsLPQzDgKoR1UZykOkD8CIDkxT2GUrXC5aejGMQkTReqSrOCGGF6sUUBQo00Sz4ugrOQ'

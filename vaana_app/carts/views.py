@@ -125,7 +125,6 @@ class CartItemView(APIView):
                 item = CartItem.objects.create(product=product, quantity=payload['quantity'])
                 
                 cart.items.add(item)
-
                 response['body'] = CartSerializer(cart).data
                 response['status'] = status.HTTP_201_CREATED
                 
@@ -152,6 +151,7 @@ class CartItemUpdateView(RetrieveUpdateAPIView):
             if product.quantity > quantity:
                 try:
                     cart = Cart.objects.get(owner=user, status = Cart.OPEN)
+                    
                     try:
                         cart_item = CartItem.objects.get(id=id)
                         cart_item.quantity = quantity

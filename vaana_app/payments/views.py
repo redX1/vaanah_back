@@ -28,7 +28,14 @@ def updateProductsQuantity(cart):
             product = item.product
             product.quantity = product.quantity - item.quantity
             product.save()
+            email_data = {
+                'email_body': str(item.quantity) + ' of your  product ' + product.name + ' have been ordered',
+                'to_email': product.created_by.email,
+                'email_subject': 'Product ordered'
+                }
+            send_email(email_data)
         except Exception as e:
+            print(str(e))
             pass
 
 class InitiateStripePayement(APIView):
@@ -46,9 +53,9 @@ class InitiateStripePayement(APIView):
                 email=user.email
             )
             intent = stripe.PaymentIntent.create(
-                payment_method_types=['card'],
+                payment_method_types=[payload['method']],
                 amount = payload['amount'] * 100,
-                currency = 'EUR',
+                currency = payload['currency'],
                 customer=customer.id
             )
             serializer.save()

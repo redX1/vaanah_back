@@ -4,7 +4,9 @@ from shippings.models import ShippingMethod
 from addresses.models import Address
 from carts.models import Cart
 from .models import Order, ShippingAddress
-from .serializers import OrderSerializer, SellerOrderSerializer
+from .serializers import OrderSerializer, SellerOrderSerializer, ShippingAddressSerializer
+from shippings.serializers import ShippingMethodSerializer
+from products.serializers import ProductSerializer
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -84,14 +86,13 @@ class GetSellerOrderAPIView(APIView):
         return {
             'id': order.id,
             'number': order.number,
-            'products': products,
-            'user': order.user,
+            'products': ProductSerializer(products, many=True).data,
             "currency": order.currency,
             "total_tax": order.total_tax,
             "shipping_tax": order.shipping_tax,
             "total_prices": order.total_prices,
-            "shipping_address": order.shipping_address,
-            "shipping_method": order.shipping_method,
+            "shipping_address": ShippingAddressSerializer(order.shipping_address).data,
+            "shipping_method": ShippingMethodSerializer(order.shipping_method).data,
             "status": order.status,
             "created_at": order.created_at,
             "updated_at": order.updated_at,
@@ -126,7 +127,7 @@ class GetSellerOrderAPIView(APIView):
                 f_order = self.filterOrderBySeller(order, user)
                 if f_order is not None:
                     data.append(f_order)
-            response['body'] = SellerOrderSerializer(data, many=True).data
+            response['body'] = data
             response['status'] = status.HTTP_200_OK
 
         return JsonResponse(response['body'], status=response['status'], safe=False)

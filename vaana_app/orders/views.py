@@ -4,7 +4,7 @@ from shippings.models import ShippingMethod
 from addresses.models import Address
 from carts.models import Cart
 from .models import Order, ShippingAddress
-from .serializers import OrderSerializer
+from .serializers import OrderSerializer, SellerOrderSerializer
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -67,7 +67,7 @@ class InitiateOrderApiView(APIView):
             }
         return JsonResponse(response['body'], status=response['status'], safe=False)
 
-class GetOrdersAPIView(APIView):
+class GetCustomerOrderAPIView(APIView):
     @csrf_exempt
     @permission_classes([IsAuthenticated])
     def get(self, request, *args, **kwargs):
@@ -77,3 +77,56 @@ class GetOrdersAPIView(APIView):
         serializer = OrderSerializer(orders, many=True)
 
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+class GetSellerOrderAPIView(APIView):
+
+    def getSellerOrder(self, order, products):
+        return {
+            'id': order.id,
+            'number': order.number,
+            'products': products,
+            'user': order.user,
+            "currency": order.currency,
+            "total_tax": order.total_tax,
+            "shipping_tax": order.shipping_tax,
+            "total_prices": order.total_prices,
+            "shipping_address": order.shipping_address,
+            "shipping_method": order.shipping_method,
+            "status": order.status,
+            "created_at": order.created_at,
+            "updated_at": order.updated_at,
+        }
+
+    def filterOrderBySeller(self, order, user):
+        products = []
+        cart = order.cart
+
+        for item in cart.items.all():
+            product = item.product
+            if product.created_by.email == user.email:
+                products.append(product)
+        return None if len(products) == 0 else self.getSellerOrder(order, products)
+
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        response = {
+            'body': {
+                'error': 'Unauthorized action'
+            },
+            'status': status.HTTP_401_UNAUTHORIZED
+        }
+
+        if user.account_type == 'Seller':
+            orders = Order.objects.all()
+            data = []
+            for order in orders:
+                f_order = self.filterOrderBySeller(order, user)
+                if f_order is not None:
+                    data.append(f_order)
+            response['body'] = SellerOrderSerializer(data, many=True).data
+            response['status'] = status.HTTP_200_OK
+
+        return JsonResponse(response['body'], status=response['status'], safe=False)

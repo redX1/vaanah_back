@@ -121,7 +121,7 @@ class GetSellerOrderAPIView(APIView):
         }
 
         if user.account_type == 'Seller':
-            orders = Order.objects.all()
+            orders = Order.objects.filter(status=Order.CONFIRMED)
             data = []
             for order in orders:
                 f_order = self.filterOrderBySeller(order, user)

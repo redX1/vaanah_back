@@ -37,7 +37,7 @@ class StoreAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        if user.account_type == 'Seller' or user.account_type == 'SELLER':
+        if user.account_type == 'SELLER':
             try:
                 store = Store.objects.create(
                     name=payload["name"],
@@ -50,7 +50,7 @@ class StoreAPIView(APIView):
             except ObjectDoesNotExist as e:
                 return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
-            return JsonResponse({'error':'You are not a Seller !'}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({'error':'You are not a SELLER !'}, status=status.HTTP_403_FORBIDDEN)
 
 class RetrieveDeleteUpdateStoreAPIView(RetrieveUpdateAPIView):
 

@@ -118,7 +118,8 @@ class LoginSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Handles serialization and deserialization of User objects."""
-       
+    id = serializers.IntegerField(read_only=True)
+
     account_type = serializers.CharField()
     gender = serializers.CharField()
     address = AddressSerializer()
@@ -136,6 +137,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'id',
             'email', 
             'username', 
             'password', 

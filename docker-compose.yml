@@ -1,0 +1,33 @@
+version: '3.7'
+
+networks:
+    vaanah:
+      driver: bridge
+
+
+services: 
+    vaanah-database:
+        build: 
+            context: .
+            dockerfile: Dockerfile.postgres
+        container_name: vaanah-database
+        restart: unless-stopped
+        # volumes: 
+        #     - ./volumes/database:/var/lib/postgresql
+        ports: 
+            - "5433:5432"
+        networks: 
+            - vaanah
+
+    vaanah-app:
+        depends_on: 
+            - vaanah-database
+        build: 
+            context: .
+            dockerfile: Dockerfile.django
+        container_name: vaanah-app
+        restart: unless-stopped
+        ports: 
+            - "8000:8020"
+        networks: 
+            - vaanah

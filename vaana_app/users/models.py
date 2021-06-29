@@ -99,7 +99,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     is_verified = models.BooleanField(default=False)
 
     
-    account_type = models.CharField(max_length=20, default='Customer')
+    account_type = models.CharField(max_length=20, default='CUSTOMER')
     gender = models.CharField(max_length=20, default='M')
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
 

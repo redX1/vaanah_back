@@ -37,6 +37,7 @@ from rest_framework.settings import api_settings
 from addresses.serializers import AddressSerializer
 from addresses.models import Address
 from django.conf import settings
+from rest_framework import filters
 
 class UserAPIView(APIView):
     renderer_classes = (UserJSONRenderer,)
@@ -46,6 +47,15 @@ class UserAPIView(APIView):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return JsonResponse({'users': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+class SingleUserAPIView(APIView):
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = UserSerializer
+    
+    def get(self, request, user_id):
+        user = User.objects.filter(id=user_id)
+        serializer = UserSerializer(user, many=True)
+        return JsonResponse({'user': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 class CustomRedirect(HttpResponsePermanentRedirect):
 

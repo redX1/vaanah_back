@@ -28,8 +28,6 @@ class StoreSearchAPIView(ListAPIView):
 class StoreAPIView(APIView):
     serializer_class = ProductSerializer
     # pagination_class = LimitOffsetPagination
-    filter_backends = ( SearchFilter,)
-    filter_fields = ('=name', '=store_address')
 
     def get(self, request):
         stores = Store.objects.get_queryset().order_by('id')

@@ -31,7 +31,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ('email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'address')
+        fields = ('id', 'email', 'username', 'password', 'token', 'is_verified', 'account_type', 'gender', 'address')
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
@@ -45,7 +45,7 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
         fields = ['token']
 
 class LoginSerializer(serializers.Serializer):
-    # id = serializers.IntegerField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
@@ -107,6 +107,7 @@ class LoginSerializer(serializers.Serializer):
         # This is the data that is passed to the `create` and `update` methods
         # that we will see later on.
         return {
+            'id': user.id,
             'email': user.email,
             'username': user.username,
             'token': user.token,

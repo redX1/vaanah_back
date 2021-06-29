@@ -6,7 +6,7 @@ on:
 name: CICD for Vaanah-Backend
 jobs:
   build-and-push:
-    name: Vaanah Front Satging Pipeline Deployment
+    name: Vaanah-Backend pipeline
     runs-on: ubuntu-latest
     steps:
 # Check status

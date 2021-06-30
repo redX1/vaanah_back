@@ -58,6 +58,14 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
 
+    M, F = (
+        "M", "F"
+    )
+
+    CUSTOMER, SELLER = (
+        'Customer', 'Seller'
+    )
+
     GENDER_CHOICES = (
         ('M', 'M'),
         ('F', 'F'),
@@ -99,7 +107,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     is_verified = models.BooleanField(default=False)
 
     
-    account_type = models.CharField(max_length=20, default='CUSTOMER')
+    account_type = models.CharField(max_length=20, default='Customer')
     gender = models.CharField(max_length=20, default='M')
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
 

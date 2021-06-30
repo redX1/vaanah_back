@@ -1,7 +1,6 @@
-from os import name
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from rest_framework.response import Response
 
@@ -18,95 +17,80 @@ from rest_framework.decorators import permission_classes
 from products.models import Product
 from products.serializers import ProductSerializer
 from django.utils.timezone import now
+from cores.utils import CustomPagination
 
-        
-class CategoryAPIView(APIView):
-    serializer_class = CategorySerializer
-    
-    def get(self, request):
-        categories = Category.objects.get_queryset().order_by('id')
-        paginator = PageNumberPagination()
-
-        page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(categories, request)
-
-        serializer = CategorySerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-        
-    @csrf_exempt
-    @permission_classes([IsAuthenticated])
-    def post(self, request):
-        payload = json.loads(request.body)
-        user = request.user
-        if user.is_superuser == True:
-            try:
-                category = Category.objects.create(
-                    name=payload["name"],
-                    slug=payload["slug"],
-                    is_active= payload["is_active"],
-                    description=payload["description"],
-                    # parent=Category.objects.get(name=payload['parent']),
-                    created_by=user
-                )
-                serializer = CategorySerializer(category)
-                return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
-            except ObjectDoesNotExist as e:
-                return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return JsonResponse({'error':'You are not a superuser !'}, status=status.HTTP_403_FORBIDDEN)
-
-class RetrieveDeleteUpdateCategoryAPIView(RetrieveUpdateAPIView):
+class CategoryUpdateDeleteAPIView(RetrieveUpdateAPIView):
     serializer_class = CategorySerializer
 
     def get(self, request, category_id):
-        category = Category.objects.get(id=category_id)
-        serializer = CategorySerializer(category)
-        return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        try:
+            category = Category.objects.get(id=category_id, is_active=True)
+            serializer = CategorySerializer(category)
+            response = {
+                'body': serializer.data,
+                'status': status.HTTP_200_OK
+            }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
     @permission_classes([IsAuthenticated])
     def put(self, request, category_id):
-        user = request.user.id
+        user = request.user
         payload = json.loads(request.body)
-        try:
-            category_item = Category.objects.filter(created_by=user, id=category_id)
-            category_item.update(
-                **payload,
-                updated_at=now()
-                )
-            category = Category.objects.get(id=category_id)
-            serializer = CategorySerializer(category)
-            return JsonResponse({'category': serializer.data}, safe=False, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+        response = {
+            'body': {
+                'error':'Unauthorized action'
+            },
+            'status': status.HTTP_403_FORBIDDEN
+        }
+
+        if user.is_superuser == True:
+            try:
+                category_item = Category.objects.filter(created_by=user, id=category_id)
+                category_item.update(
+                    **payload,
+                    updated_at=now()
+                    )
+                category = Category.objects.get(id=category_id)
+                serializer = CategorySerializer(category)
+                response['body'] = serializer.data
+                response['status'] = status.HTTP_200_OK
+
+            except ObjectDoesNotExist as e:
+                response['body'] = {'error': str(e)}
+                response['status'] = status.HTTP_404_NOT_FOUND
+
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
     @permission_classes([IsAuthenticated])
     def delete(self, request, category_id):
-        user = request.user.id
-        try:
-            category = Category.objects.get(created_by=user, id=category_id)
-            category.delete()
-            return Response('Success' ,status=status.HTTP_204_NO_CONTENT)
-        except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+        user = request.user
+        response = {
+            'body': {
+                'error':'Unauthorized action'
+            },
+            'status': status.HTTP_403_FORBIDDEN
+        }
 
+        if user.is_superuser == True:
+            try:
+                category = Category.objects.get(created_by=user, id=category_id)
+                category.delete()
+                response['body'] = 'Success'
+                response['status'] = status.HTTP_200_OK
+            except ObjectDoesNotExist as e:
+                response['body'] = {'error': str(e)}
+                response['status'] = status.HTTP_404_NOT_FOUND
 
-class CategoryProductsAPIView(APIView):
-    serializer_class = ProductSerializer
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
-    def get(self, request, category_id):
-        products = Product.objects.filter(category=category_id)
-        paginator = PageNumberPagination()
-
-        page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(products, request)
-
-        serializer = ProductSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-
-class CategoryActivatedAPIView(APIView):
+class CategoryAPIView(APIView):
     def get(self, request):
         categories = Category.objects.filter(is_active=True)
         paginator = PageNumberPagination()
@@ -118,18 +102,37 @@ class CategoryActivatedAPIView(APIView):
         serializer = CategorySerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-class CategoryDeactivatedAPIView(APIView):
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def post(self, request):
+        payload = json.loads(request.body)
+        user = request.user
+        response = {
+            'body': {
+                'error':'Unauthorized action'
+            },
+            'status': status.HTTP_403_FORBIDDEN
+        }
 
-    def get(self, request):
-        categories = Category.objects.filter(is_active=False)
-        paginator = PageNumberPagination()
-
-        page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(categories, request)
-
-        serializer = CategorySerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        if user.is_superuser == True:
+            try:
+                category = Category.objects.create(
+                    name=payload["name"],
+                    slug=payload["slug"],
+                    is_active= payload["is_active"],
+                    description=payload["description"],
+                    # parent=Category.objects.get(name=payload['parent']),
+                    created_by=user
+                )
+                serializer = CategorySerializer(category)
+                response['body'] = serializer.data
+                response['status'] = status.HTTP_201_CREATED
+                
+            except Exception as e:
+                response['body'] = {'error': str(e)}
+                response['status'] = status.HTTP_500_INTERNAL_SERVER_ERROR
+        
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
 class LatestCategoryAPIView(APIView):
     def get(self, request):
@@ -142,4 +145,28 @@ class LatestCategoryAPIView(APIView):
 
         serializer = CategorySerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+class CategoryProductsAPIView(APIView):
+    def get(self, request, category_id):
+        try:
+            category = Category.objects.get(id=category_id, is_active=True)
+            products = Product.objects.filter(category=category)
+            paginator = CustomPagination()
+
+            paginator.page_size = 20        
+            page = paginator.paginate_queryset(products, request)
+
+            serializer = ProductSerializer(page, many=True)
+            response = {
+                'body': paginator.get_paginated_response(serializer.data),
+                'status': status.HTTP_200_OK
+            }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 

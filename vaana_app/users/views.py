@@ -37,15 +37,38 @@ from rest_framework.settings import api_settings
 from addresses.serializers import AddressSerializer
 from addresses.models import Address
 from django.conf import settings
+from rest_framework import filters
 
 class UserAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
     
     def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return JsonResponse({'users': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        user = request.user
+        if user.is_superuser == True :
+            try:
+                users = User.objects.all()
+                serializer = UserSerializer(users, many=True)
+                return JsonResponse({'users': serializer.data}, safe=False, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist as e:
+                return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return JsonResponse({'error':'You are not a superuser !'}, status=status.HTTP_403_FORBIDDEN)
+
+class SingleUserAPIView(APIView):
+    renderer_classes = (UserJSONRenderer,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+    
+    def get(self, request, user_id):
+        owner = request.user.id
+        user = User.objects.filter(id=user_id)
+        if owner == user_id:
+            serializer = UserSerializer(user, many=True)
+            return JsonResponse({'user': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'error':'Forbidden !'}, status=status.HTTP_403_FORBIDDEN)
 
 class CustomRedirect(HttpResponsePermanentRedirect):
 

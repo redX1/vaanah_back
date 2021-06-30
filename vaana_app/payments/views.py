@@ -56,7 +56,11 @@ class InitiateStripePayement(APIView):
                 payment_method_types=[payload['method']],
                 amount = payload['amount'] * 100,
                 currency = payload['currency'],
-                customer=customer.id
+                customer=customer.id,
+                metadata={
+                    "order_number": payload['order_number']
+                },
+                receipt_email=user.email
             )
             serializer.save()
             response = {
@@ -89,12 +93,12 @@ class ConfirmStripePayment(RetrieveUpdateAPIView):
             intent = stripe.PaymentIntent.retrieve(payment_intent_id)
             response = {
                 'body': {
-                    'error': 'Intent not valid'
+                    'error': 'Intent not valid or Order number not valid'
                 },
                 'status': status.HTTP_400_BAD_REQUEST            
             }
 
-            if intent['status'] == 'succeeded':
+            if intent['status'] == 'succeeded' and intent['metadata']['order_number'] == payload['order_number']:
                 try:
                     order = Order.objects.get(number=payload['order_number'], user=user)
                     payment = PaymentModel.objects.get(order_number=payload['order_number'])

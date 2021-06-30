@@ -1,5 +1,5 @@
 from rest_framework.decorators import permission_classes
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import JsonResponse
@@ -16,11 +16,19 @@ from products.models import Product
 from products.serializers import ProductSerializer
 from rest_framework.views import APIView
 from django.utils.timezone import now
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+class StoreSearchAPIView(ListAPIView):
+    serializer_class = StoreSerializer
+    queryset  = Store.objects.all()
+    filter_backends =  [SearchFilter,]
+    search_fields = ['name', 'store_address']
+    
 
 class StoreAPIView(APIView):
     serializer_class = ProductSerializer
     # pagination_class = LimitOffsetPagination
-    
+
     def get(self, request):
         stores = Store.objects.get_queryset().order_by('id')
         paginator = PageNumberPagination()

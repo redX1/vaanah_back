@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.urls import path
 
 from .views import (
-    LoginAPIView, PasswordTokenCheckAPI, RegistrationAPIView, ResendEmailAPI, RequestPasswordResetEmail, SetNewPasswordAPIView, UserRetrieveUpdateAPIView, VerifyEmail, UserStoreAPIView, UserAPIView
+    LoginAPIView, PasswordTokenCheckAPI, RegistrationAPIView, ResendEmailAPI, RequestPasswordResetEmail, SetNewPasswordAPIView, SingleUserAPIView, UserRetrieveUpdateAPIView, VerifyEmail, UserStoreAPIView, UserAPIView
 )
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -21,5 +21,6 @@ urlpatterns = [
     
     path('users/<int:user_id>/stores', UserStoreAPIView.as_view()),
     path('users/all', UserAPIView.as_view()),
+    path('users/<int:user_id>', SingleUserAPIView.as_view()),
 
 ]

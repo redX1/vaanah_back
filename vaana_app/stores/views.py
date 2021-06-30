@@ -9,7 +9,6 @@ from .serializers import StoreSerializer
 from .models import Store
 from rest_framework import status
 
-from .models import Store
 import json
 from django.core.exceptions import ObjectDoesNotExist
 from products.models import Product
@@ -26,7 +25,7 @@ class StoreSearchAPIView(ListAPIView):
     
 
 class StoreAPIView(APIView):
-    serializer_class = ProductSerializer
+    serializer_class = StoreSerializer
     # pagination_class = LimitOffsetPagination
 
     def get(self, request):

@@ -56,4 +56,6 @@ urlpatterns = [
 
     path('api/', include('payments.urls'), name='payments'),
 
+    path('api/', include('wishlist.urls'), name='wishlist'),
+
 ]

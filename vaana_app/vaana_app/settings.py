@@ -67,7 +67,9 @@ INSTALLED_APPS = [
     'countries',
     'django_seed',
     'shippings',
-    'payments'
+    'payments',
+    'wishlist',
+    'mptt',
 
 ]
 
@@ -112,7 +114,7 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'postgres2',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',

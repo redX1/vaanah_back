@@ -10,19 +10,21 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import status
+from rest_framework import serializers, status
 import json
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Product, Category, Review, Store
 from .serializers import ProductSerializer, ReviewSerializer
 from django.utils.timezone import now
+from cores.utils import CustomPagination
+from users.models import User
 
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer
-    
+
     def get(self, request):
-        products = Product.objects.get_queryset().order_by('id')
+        products = Product.objects.filter(is_active=True)
         paginator = PageNumberPagination()
 
         page_size = 20
@@ -37,39 +39,71 @@ class ProductAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        if user.account_type == 'SELLER':
+        serializer = ProductSerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+        response = {
+            'body': {
+                'error':'Unauthorized action'
+            },
+            'status': status.HTTP_403_FORBIDDEN
+        }
+        if user.account_type == User.SELLER:
             try:
+                store = Store.objects.get(id=payload['store'], created_by= user)
+                category = Category.objects.get(id=payload['category'])
                 product = Product.objects.create(
-                category=Category.objects.get(id=payload['category']),
-                name=payload["name"],
-                slug=payload["slug"],
-                description=payload["description"],
-                price=payload["price"],
-                is_active= payload["is_active"],
-                quantity= payload["quantity"],
-                image= payload["image"],
-                created_by=user,
-                store=Store.objects.get(id=payload['store'])
-                )
-                serializer = ProductSerializer(product)
-                return JsonResponse({'products': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
+                    category=category,
+                    name=payload["name"],
+                    slug=payload["slug"],
+                    description=payload["description"],
+                    price=payload["price"],
+                    is_active= payload["is_active"],
+                    quantity= payload["quantity"],
+                    image= payload["image"],
+                    created_by=user,
+                    store=store
+                    )
+                response['body'] = ProductSerializer(product).data
+                response['status'] = status.HTTP_201_CREATED
             except ObjectDoesNotExist as e:
-                return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return JsonResponse({'error':'You are not a SELLER !'}, status=status.HTTP_403_FORBIDDEN)
-        
+                response['body'] = {'error': str(e)}
+                response['status'] = status.HTTP_404_NOT_FOUND
 
-class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
-    serializer_class = ProductSerializer
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
+class SellerProductAPIView(APIView):
+    @permission_classes([IsAuthenticated])
+    def get(self, request):
+        user = request.user
+        products = Product.objects.filter(created_by=user)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+class ProductUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, product_id):
-        product = Product.objects.get(id=product_id)
-        serializer = ProductSerializer(product)
-        return JsonResponse({'product': serializer.data}, safe=False, status=status.HTTP_200_OK)
+        try:
+            product = Product.objects.get(id=product_id)
+            serializer = ProductSerializer(product)
+            response = {
+                'body': serializer.data,
+                'status': status.HTTP_200_OK
+            }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
     @permission_classes([IsAuthenticated])
-    def update(self, request, product_id):
-        user = request.user.id
+    def put(self, request, product_id):
+        user = request.user
         payload = json.loads(request.body)
         try:
             product_item = Product.objects.filter(created_by=user, id=product_id)
@@ -79,46 +113,37 @@ class RetrieveDeleteUpdateProductAPIView(RetrieveUpdateAPIView):
                 )
             product = Product.objects.get(id=product_id)
             serializer = ProductSerializer(product)
-            return JsonResponse({'product': serializer.data}, safe=False, status=status.HTTP_200_OK)
+            response = {
+                'body': serializer.data,
+                'status': status.HTTP_200_OK
+            }
         except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
     @permission_classes([IsAuthenticated])
     def delete(self, request, product_id):
-        user = request.user.id
+        user = request.user
         try:
             product = Product.objects.get(created_by=user, id=product_id)
             product.delete()
-            return Response('Success' ,status=status.HTTP_204_NO_CONTENT)
+            response = {
+                'body': 'Success',
+                'status': status.HTTP_200_OK
+            }
         except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
-
-
-class ProductActivatedAPIView(APIView):
-    def get(self, request):
-        products = Product.objects.filter(is_active=True)
-        paginator = PageNumberPagination()
-
-        page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(products, request)
-
-        serializer = ProductSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-class ProductDeactivatedAPIView(APIView):
-
-    def get(self, request):
-        products = Product.objects.filter(is_active=False)
-        paginator = PageNumberPagination()
-
-        page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(products, request)
-
-        serializer = ProductSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
 class LatestProductAPIView(APIView):
     def get(self, request):
@@ -136,61 +161,77 @@ class ProductReviewsAPIView(APIView):
     serializer_class = ReviewSerializer
 
     def get(self, request, product_id):
-        reviews = Review.objects.filter(product=product_id)
-        paginator = PageNumberPagination()
+        try:
+            product = Product.objects.get(id=product_id, is_active=True)
+            reviews = Review.objects.filter(product=product)
+            paginator = CustomPagination()
+            paginator.page_size = 20        
+            page = paginator.paginate_queryset(reviews, request)
 
-        page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(reviews, request)
-
-        serializer = ReviewSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-class ReviewAPIView(APIView):
-    serializer_class = ReviewSerializer
-    
-    def get(self, request):
-        reviews = Review.objects.get_queryset().order_by('id')
-        paginator = PageNumberPagination()
-
-        page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(reviews, request)
-
-        serializer = ReviewSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
+            serializer = ReviewSerializer(page, many=True)
+            response = {
+                'body': paginator.get_paginated_response(serializer.data),
+                'status': status.HTTP_200_OK
+            }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
     @csrf_exempt
     @permission_classes([IsAuthenticated])
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
+        serializer = ReviewSerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
         try:
+            product = Product.objects.get(id=payload['product'])
             review = Review.objects.create(
                 title=payload["title"],
                 comment=payload["comment"],
                 rating=payload["rating"],
-                product=Product.objects.get(id=payload['product']),
+                product=product,
                 user=user
             )
-            serializer = ReviewSerializer(review)
-            return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_201_CREATED)
-        except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+            response = {
+                'body': ReviewSerializer(review).data,
+                'status': status.HTTP_201_CREATED
+            }
+        except Exception as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
-
-class RetrieveDeleteUpdateReviewAPIView(RetrieveUpdateAPIView):
-    serializer_class = ReviewSerializer
-
+class ReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, review_id):
-        review = Review.objects.get(id=review_id)
-        serializer = ReviewSerializer(review)
-        return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_200_OK)
-
+        try:
+            review = Review.objects.get(id=review_id)
+            serializer = ReviewSerializer(review)
+            response = {
+                    'body': serializer.data,
+                    'status': status.HTTP_200_OK
+                }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
+    
     @permission_classes([IsAuthenticated])
-    def update(self, request, review_id):
-        user = request.user.id
+    def put(self, request, review_id):
+        user = request.user
         payload = json.loads(request.body)
         try:
             review_item = Review.objects.filter(user=user, id=review_id)
@@ -200,17 +241,34 @@ class RetrieveDeleteUpdateReviewAPIView(RetrieveUpdateAPIView):
                 )
             review = Review.objects.get(id=review_id)
             serializer = ReviewSerializer(review)
-            return JsonResponse({'review': serializer.data}, safe=False, status=status.HTTP_200_OK)
+            response = {
+                    'body': serializer.data,
+                    'status': status.HTTP_200_OK
+                }
         except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
 
     @permission_classes([IsAuthenticated])
     def delete(self, request, review_id):
-        user = request.user.id
+        user = request.user
         try:
             review = Review.objects.get(user=user, id=review_id)
             review.delete()
-            return Response('Success' ,status=status.HTTP_204_NO_CONTENT)
+            response = {
+                'body': 'Success',
+                'status': status.HTTP_200_OK
+            }
         except ObjectDoesNotExist as e:
-            return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
-
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)

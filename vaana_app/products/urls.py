@@ -5,13 +5,12 @@ from . import views
 urlpatterns = [
 
     path('products', views.ProductAPIView.as_view()),
-    path('products/<uuid:product_id>', views.RetrieveDeleteUpdateProductAPIView.as_view()),
+    path('products/<uuid:product_id>', views.ProductUpdateDeleteAPIView.as_view()),
     path('products/<uuid:product_id>/reviews', views.ProductReviewsAPIView.as_view()),
-    path('products/activated', views.ProductActivatedAPIView.as_view()),
-    path('products/deactivated', views.ProductDeactivatedAPIView.as_view()),
     path('products/latest', views.LatestProductAPIView.as_view()),
 
-    path('products/reviews', views.ReviewAPIView.as_view()),
-    path('products/reviews/<uuid:review_id>', views.RetrieveDeleteUpdateReviewAPIView.as_view()),
+    path('products/reviews', views.ProductReviewsAPIView.as_view()),
+    path('products/reviews/<uuid:review_id>', views.ReviewUpdateDeleteAPIView.as_view()),
+    path('products/sellers', views.SellerProductAPIView.as_view()),
 
 ]

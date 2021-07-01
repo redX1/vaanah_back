@@ -3,7 +3,7 @@ from django.http import Http404
 from rest_framework.pagination import PageNumberPagination
 
 from rest_framework.views import APIView
-from rest_framework.generics import  RetrieveUpdateAPIView
+from rest_framework.generics import  RetrieveUpdateAPIView, ListAPIView
 from rest_framework.response import Response
 
 from rest_framework.decorators import api_view, permission_classes
@@ -19,6 +19,13 @@ from .serializers import ProductSerializer, ReviewSerializer
 from django.utils.timezone import now
 from cores.utils import CustomPagination
 from users.models import User
+from rest_framework.filters import SearchFilter
+
+class ProductSearchAPIView(ListAPIView):
+    serializer_class = ProductSerializer
+    queryset  = Product.objects.all()
+    filter_backends =  [SearchFilter,]
+    search_fields = ['name', 'description']
 
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer

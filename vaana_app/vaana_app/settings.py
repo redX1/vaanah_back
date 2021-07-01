@@ -68,9 +68,7 @@ INSTALLED_APPS = [
     'django_seed',
     'shippings',
     'payments',
-    'wishlist',
-    'mptt',
-
+    'wishlist'
 ]
 
 MIDDLEWARE = [

@@ -1,5 +1,5 @@
 ---
-- hosts: webservers
+- hosts: djangoserver
   tasks:
   - name: install pip3
     apt:

@@ -13,11 +13,11 @@ class WishListItem(TimestampedModel):
 
 class WishList(TimestampedModel):
     """
-    Cart object
+    WishList object
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name='wishlist', on_delete=models.CASCADE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='wishlist', on_delete=models.CASCADE)
 
     items = models.ManyToManyField(WishListItem, blank=True)
 

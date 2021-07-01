@@ -9,7 +9,6 @@ from .serializers import StoreSerializer
 from .models import Store
 from rest_framework import serializers, status
 
-from .models import Store
 import json
 from django.core.exceptions import ObjectDoesNotExist
 from products.models import Product

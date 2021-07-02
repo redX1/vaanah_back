@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
@@ -18,6 +18,13 @@ from products.models import Product
 from products.serializers import ProductSerializer
 from django.utils.timezone import now
 from cores.utils import CustomPagination
+from rest_framework.filters import SearchFilter
+
+class CategorySearchAPIView(ListAPIView):
+    serializer_class = CategorySerializer
+    queryset  = Category.objects.all()
+    filter_backends =  [SearchFilter,]
+    search_fields = ['name', 'description']
 
 class CategoryUpdateDeleteAPIView(RetrieveUpdateAPIView):
     serializer_class = CategorySerializer

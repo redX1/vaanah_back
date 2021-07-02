@@ -1,5 +1,5 @@
 ---
-- hosts: webservers
+- hosts: djangoserver
   tasks:
   - name: install pip3
     apt:
@@ -25,5 +25,5 @@
 
   - name: Run Image
     shell: |
-      docker run -d -p 8080:8020 papeterinnova/vaana-django:latest
+      docker run -d -p 8085:8020 papeterinnova/vaana-django:latest
     become: yes

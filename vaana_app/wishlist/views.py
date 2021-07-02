@@ -47,7 +47,7 @@ class WishListAddView(APIView):
             
         except Exception:
             try:
-                wishlist = Wishlist.objects.create(owner=user)
+                wishlist = WishList.objects.create(owner=user)
                 serializer = WishListSerializer(wishlist)
                 response['body'] = serializer.data
                 response['status'] = status.HTTP_201_CREATED
@@ -61,21 +61,21 @@ class WishListAddView(APIView):
     @swagger_auto_schema(
         operation_description="apiview post description override",
         security=[],
-        tags=['Wishlists'],
+        tags=['WishLists'],
     )
     @permission_classes([IsAuthenticated])
     def get(self, request, *args, **kwargs):
         user = request.user
         
         try:
-            wishlist = Wishlist.objects.get(owner = user)
+            wishlist = WishList.objects.get(owner = user)
             response = {
                 'body': WishListSerializer(wishlist).data,
                 'status': status.HTTP_200_OK
             }
         except Exception:
             try:
-                wishlist = Wishlist.objects.create(owner=user)
+                wishlist = WishList.objects.create(owner=user)
                 serializer = WishListSerializer(wishlist)
                 response = {
                     'body': serializer.data,

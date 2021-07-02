@@ -4,7 +4,7 @@ from shippings.models import ShippingMethod
 from addresses.models import Address
 from carts.models import Cart
 from .models import Order, ShippingAddress
-from .serializers import OrderSerializer, SellerOrderSerializer, ShippingAddressSerializer
+from .serializers import OrderDetailsSerializer, OrderSerializer, SellerOrderSerializer, ShippingAddressSerializer
 from shippings.serializers import ShippingMethodSerializer
 from products.serializers import ProductSerializer
 from django.shortcuts import render
@@ -57,7 +57,7 @@ class InitiateOrderApiView(APIView):
                 'email_subject': 'Order initiated'}
             send_email(email_data)
             response = {
-                'body': OrderSerializer(order).data,
+                'body': OrderDetailsSerializer(order).data,
                 'status': status.HTTP_201_CREATED
             }
         except Exception as e:
@@ -76,7 +76,7 @@ class GetCustomerOrderAPIView(APIView):
         user = request.user
 
         orders = Order.objects.filter(user=user)
-        serializer = OrderSerializer(orders, many=True)
+        serializer = OrderDetailsSerializer(orders, many=True)
 
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
@@ -131,3 +131,25 @@ class GetSellerOrderAPIView(APIView):
             response['status'] = status.HTTP_200_OK
 
         return JsonResponse(response['body'], status=response['status'], safe=False)
+
+class OrderDetailsAPIView(APIView):
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def get(self, request, id):
+        user = request.user
+
+        try:
+            order = Order.objects.get(id=id, user=user)
+            response = {
+                'body': OrderDetailsSerializer(order).data,
+                'status': status.HTTP_200_OK
+            }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+
+        return JsonResponse(response['body'], status = response['status'], safe=False)

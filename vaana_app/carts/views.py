@@ -1,7 +1,7 @@
 from logging import exception
 from rest_framework.serializers import Serializer
 from .models import Cart, CartItem
-from .serializers import CartSerializer, CartItemSerializer
+from .serializers import CartDetailsSerializer, CartSerializer, CartItemSerializer
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -43,12 +43,12 @@ class CartAddView(APIView):
 
         try:
             cart = Cart.objects.get(owner = user, status = Cart.OPEN)
-            response ['body']['data'] = CartSerializer(cart).data
+            response ['body']['data'] = CartDetailsSerializer(cart).data
             
         except Exception:
             try:
                 cart = Cart.objects.create(owner=user, status = Cart.OPEN)
-                serializer = CartSerializer(cart)
+                serializer = CartDetailsSerializer(cart)
                 response['body'] = serializer.data
                 response['status'] = status.HTTP_201_CREATED
 
@@ -70,13 +70,13 @@ class CartAddView(APIView):
         try:
             cart = Cart.objects.get(owner = user, status = Cart.OPEN)
             response = {
-                'body': CartSerializer(cart).data,
+                'body': CartDetailsSerializer(cart).data,
                 'status': status.HTTP_200_OK
             }
         except Exception:
             try:
                 cart = Cart.objects.create(owner=user, status = Cart.OPEN)
-                serializer = CartSerializer(cart)
+                serializer = CartDetailsSerializer(cart)
                 response = {
                     'body': serializer.data,
                     'status': status.HTTP_200_OK
@@ -125,7 +125,7 @@ class CartItemView(APIView):
                 item = CartItem.objects.create(product=product, quantity=payload['quantity'])
                 
                 cart.items.add(item)
-                response['body'] = CartSerializer(cart).data
+                response['body'] = CartDetailsSerializer(cart).data
                 response['status'] = status.HTTP_201_CREATED
                 
         return JsonResponse(response['body'], status = response['status'])
@@ -156,7 +156,7 @@ class CartItemUpdateView(RetrieveUpdateAPIView):
                         cart_item = CartItem.objects.get(id=id)
                         cart_item.quantity = quantity
                         cart_item.save()
-                        response['body'] = CartSerializer(cart).data
+                        response['body'] = CartDetailsSerializer(cart).data
                         response['status'] = status.HTTP_200_OK
                     except ObjectDoesNotExist as e:
                         response['body']['error'] = 'Item not founded'
@@ -179,7 +179,7 @@ class CartItemUpdateView(RetrieveUpdateAPIView):
                     cart_item = CartItem.objects.get(id=id)
                     cart.items.remove(cart_item)
                     response = {
-                        'body': CartSerializer(cart).data,
+                        'body': CartDetailsSerializer(cart).data,
                         'status': status.HTTP_200_OK
                     }
                 except ObjectDoesNotExist:

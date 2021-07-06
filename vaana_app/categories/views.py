@@ -24,7 +24,7 @@ class CategorySearchAPIView(ListAPIView):
     serializer_class = CategorySerializer
     queryset  = Category.objects.all()
     filter_backends =  [SearchFilter,]
-    search_fields = ['name', 'description']
+    search_fields = ['^name']
 
 class CategoryUpdateDeleteAPIView(RetrieveUpdateAPIView):
     serializer_class = CategorySerializer

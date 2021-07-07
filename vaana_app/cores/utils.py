@@ -11,6 +11,7 @@ def generate_random_string(chars=DEFAULT_CHAR_STRING, size=6):
 def send_email(data):
     email = EmailMessage(
         subject=data['email_subject'], body=data['email_body'], to=[data['to_email']])
+    email.content_subtype = "html" 
     email.send()
 
 class CustomPagination(pagination.PageNumberPagination):

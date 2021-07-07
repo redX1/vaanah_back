@@ -25,5 +25,5 @@
 
   - name: Run Image
     shell: |
-      docker run -d -p 8000:8020 papeterinnova/vaana-django:latest
+      docker run -d -p 8001:8020 papeterinnova/vaana-django:latest
     become: yes

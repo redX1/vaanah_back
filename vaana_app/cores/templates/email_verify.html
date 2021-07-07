@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="email_verify.scss" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" 
+      style="background-image: url('https://vaanahs3media.s3.eu-central-1.amazonaws.com/static/vaanah+icons/bg-navbar.svg') !important;
+      background-color: #f39221 !important;
+      height: 90px;
+      z-index: 1;
+      padding: 0 8rem;">   
+    </nav>
+  
+    <div class="mx-auto logo" 
+      style="background-color: #fff;
+        border: 1px solid gray;
+        width: 275px;
+        height: 275px;
+        position: relative;
+        top: -215px;
+        border-radius: 50%;
+        z-index: 1;
+        cursor: pointer;
+        border: 1px solid gray;
+        margin: 0 auto;">
+      <img src="https://vaanahs3media.s3.eu-central-1.amazonaws.com/static/vaanah+icons/vanaa_logo.svg"   alt="vanaa_logo"  style=" width: 270px; height: 360px;"/>
+    </div>
+
+   <div style="    margin-top: -200px; ">
+    <div style="color: #29235c; 
+    display: flex;
+    justify-content: center;
+    align-items: center;">
+    <h4> <span style="color: #f39221;">Congratulations</span>,  your account has been created.</h4> 
+  </div>
+  <div>
+    <h1 style=" color: #29235c;
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;">
+      Your informations 
+    </h1>
+  </div>
+
+  <div style=" background-color: #29235c;
+    border-radius: 10px;
+    margin-top: 15px;
+    display: flex;
+    height: 250px;
+    width: 500px;
+    margin: 0 auto;">
+    <div >
+      <div style=" margin-left: 15px;">
+        <h3 style="color: #f39221; text-decoration: underline;">Email :</h3>
+        <h3 style="color: #fff;">{{email}}</h3><br>
+      </div>
+      <div style="margin-left: 15px;">
+        <h3 style="color: #f39221; text-decoration: underline;">Username :</h3>
+        <h3 style="color: #fff;">{{username}}</h3><br>
+      </div>
+    </div>
+  </div>
+<br>
+  <div style=" background-color: #29235c;
+    border-radius: 5px;
+    display: flex;  
+    height: 50px;
+    width: 200px;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;">
+    <a href="{{absurl}}" style="color: #fff; text-decoration: none;"><h4>Activate your account</h4></a>
+  </div>
+
+  <div style=" background-color: #29235c;
+    margin-top: 15px;
+    height: 250px;
+    justify-content: center;
+    display: flex;">
+    <span style="color: #f39221; margin-top: 15px;">This message was sent automatically, do not reply.</span>
+  </div>
+   </div>
+  </body>
+</html>
+

@@ -1,6 +1,7 @@
-from collections import OrderedDict
+from decimal import Context
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse
+from django.template.context import RequestContext
 from rest_framework import pagination
 from stores.models import Store
 from stores.serializers import StoreSerializer
@@ -18,7 +19,7 @@ import json
 from .models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from .utils import Util
+from cores.utils import send_email
 import jwt
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -36,8 +37,9 @@ import os
 from rest_framework.settings import api_settings
 from addresses.serializers import AddressSerializer
 from addresses.models import Address
-from django.conf import settings
 from rest_framework import filters
+from django.template.loader import get_template, render_to_string
+from django.shortcuts import render
 
 class UserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -107,17 +109,23 @@ class RegistrationAPIView(APIView):
         user = User.objects.get(email=user_data['email']) """
         token = RefreshToken.for_user(user).access_token
         email = user.email
+        absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email        
 
-        # token = user_data['token']
+        context = {
+            "username": user.username, 
+            "email": email,
+            "absurl": absurl
+            }
+        html_template = get_template( "email_verify.html").render(context)
+
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
         #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ "&email="+ email
-        absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email        
-        email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
+        email_body = html_template #+'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
-        Util.send_email(data)
+        send_email(data)
 
         return Response(RegistrationSerializer(user).data, status=status.HTTP_201_CREATED)
 
@@ -141,7 +149,7 @@ class ResendEmailAPI(APIView):
             email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
             data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
-            Util.send_email(data)
+            send_email(data)
             return Response({'code': '200'} , status=status.HTTP_200_OK)
         except ObjectDoesNotExist as e:
             return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
@@ -245,7 +253,7 @@ class RequestPasswordResetEmail(APIView):
         serializer = self.serializer_class(data=request.data)
 
         email = request.data.get('email', '')
-
+       
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
@@ -260,7 +268,7 @@ class RequestPasswordResetEmail(APIView):
                 absurl+"?redirect_url="+redirect_url
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Reset your passsword'}
-            Util.send_email(data)
+            send_email(data)
             return Response({'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
         else:
             return Response({'Your are not a user please register !'}, status=status.HTTP_404_NOT_FOUND)

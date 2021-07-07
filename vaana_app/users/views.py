@@ -1,6 +1,7 @@
-from collections import OrderedDict
+from decimal import Context
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse
+from django.template.context import RequestContext
 from rest_framework import pagination
 from stores.models import Store
 from stores.serializers import StoreSerializer
@@ -37,7 +38,8 @@ from rest_framework.settings import api_settings
 from addresses.serializers import AddressSerializer
 from addresses.models import Address
 from rest_framework import filters
-from django.template.loader import render_to_string 
+from django.template.loader import get_template, render_to_string
+from django.shortcuts import render
 
 class UserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -107,16 +109,19 @@ class RegistrationAPIView(APIView):
         user = User.objects.get(email=user_data['email']) """
         token = RefreshToken.for_user(user).access_token
         email = user.email
+        absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email        
 
-        html_template = 'cores/templates/email_verify.html'
-
-        html_message = render_to_string(html_template, { 'context': context, }) 
+        context = {
+            "username": user.username, 
+            "email": email,
+            "absurl": absurl
+            }
+        html_template = get_template( "email_verify.html").render(context)
 
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
         #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ "&email="+ email
-        absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email        
-        email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
+        email_body = html_template #+'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 

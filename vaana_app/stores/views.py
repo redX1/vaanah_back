@@ -23,7 +23,7 @@ class StoreSearchAPIView(ListAPIView):
     serializer_class = StoreSerializer
     queryset  = Store.objects.all()
     filter_backends =  [SearchFilter,]
-    search_fields = ['name', 'store_address']
+    search_fields = ['^name']
 
 class LatestStoreAPIView(APIView):
     def get(self, request):
@@ -67,7 +67,8 @@ class StoreAPIView(APIView):
                     name=payload["name"],
                     created_by=user,
                     store_address=payload['store_address'],
-                    is_active= payload["is_active"]
+                    is_active= payload["is_active"],
+                    image= payload['image'],
                 )
                 serializer = StoreSerializer(store)
                 response['body'] = serializer.data

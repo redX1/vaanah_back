@@ -15,20 +15,28 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Product, Category, Review, Store
-from .serializers import ProductSerializer, ReviewSerializer
+from .serializers import ProductResponseSerializer, ProductSerializer, ReviewSerializer
 from django.utils.timezone import now
 from cores.utils import CustomPagination
 from users.models import User
+from files.models import File
 from rest_framework.filters import SearchFilter
 
 class ProductSearchAPIView(ListAPIView):
-    serializer_class = ProductSerializer
+    serializer_class = ProductResponseSerializer
     queryset  = Product.objects.all()
     filter_backends =  [SearchFilter,]
-    search_fields = ['name', 'description']
+    search_fields = ['^name']
 
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer
+
+    def addImageToProduct(self, product, image_id):
+        try:
+            image = File.objects.get(id=image_id)
+            product.images.add(image)
+        except Exception:
+            pass
 
     def get(self, request):
         products = Product.objects.filter(is_active=True)
@@ -38,7 +46,7 @@ class ProductAPIView(APIView):
         paginator.page_size = page_size        
         page = paginator.paginate_queryset(products, request)
 
-        serializer = ProductSerializer(page, many=True)
+        serializer = ProductResponseSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
     @csrf_exempt
@@ -66,11 +74,12 @@ class ProductAPIView(APIView):
                     price=payload["price"],
                     is_active= payload["is_active"],
                     quantity= payload["quantity"],
-                    image= payload["image"],
                     created_by=user,
                     store=store
                     )
-                response['body'] = ProductSerializer(product).data
+                for i in payload['images']:
+                    self.addImageToProduct(product, i)
+                response['body'] = ProductResponseSerializer(product).data
                 response['status'] = status.HTTP_201_CREATED
             except ObjectDoesNotExist as e:
                 response['body'] = {'error': str(e)}
@@ -87,14 +96,14 @@ class SellerProductAPIView(APIView):
         paginator.page_size = 20        
         page = paginator.paginate_queryset(products, request)
 
-        serializer = ProductSerializer(page, many=True)
+        serializer = ProductResponseSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
 class ProductUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, product_id):
         try:
             product = Product.objects.get(id=product_id)
-            serializer = ProductSerializer(product)
+            serializer = ProductResponseSerializer(product)
             response = {
                 'body': serializer.data,
                 'status': status.HTTP_200_OK
@@ -119,7 +128,7 @@ class ProductUpdateDeleteAPIView(RetrieveUpdateAPIView):
                 updated_at=now()
                 )
             product = Product.objects.get(id=product_id)
-            serializer = ProductSerializer(product)
+            serializer = ProductResponseSerializer(product)
             response = {
                 'body': serializer.data,
                 'status': status.HTTP_200_OK
@@ -161,7 +170,7 @@ class LatestProductAPIView(APIView):
         paginator.page_size = page_size        
         page = paginator.paginate_queryset(products, request)
 
-        serializer = ProductSerializer(page, many=True)
+        serializer = ProductResponseSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
 class ProductReviewsAPIView(APIView):

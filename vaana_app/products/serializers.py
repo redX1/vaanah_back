@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Product, Review
-
+from files.serializers import FileSerializer
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,6 +17,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         ]
 class ProductSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True)
+    images = serializers.ListField()
 
     class Meta:
         model = Product
@@ -30,10 +31,33 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_active",
             "quantity",
             "rating",
-            "image",
+            "images",
             "created_by",
             "created_at",
             "updated_at",
             "store",
-            "reviews"
+            "reviews",
+        ]
+class ProductResponseSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True)
+    images = FileSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "price",
+            "category",
+            "is_active",
+            "quantity",
+            "rating",
+            "images",
+            "created_by",
+            "created_at",
+            "updated_at",
+            "store",
+            "reviews",
         ]

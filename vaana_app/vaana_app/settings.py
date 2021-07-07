@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'djoser',
+    'storages',
 
     'cores',
     'users',
@@ -71,7 +72,8 @@ INSTALLED_APPS = [
     'django_seed',
     'shippings',
     'payments',
-    'wishlist'
+    'wishlists',
+    'images'
 ]
 
 MIDDLEWARE = [
@@ -161,6 +163,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 #CORS_ORIGIN_WHITELIST = ['*']
 
@@ -186,8 +190,6 @@ APPEND_SLASH=False
 # the `authentication` module. This module is registered above in a setting
 # called `INSTALLED_APPS`.
 AUTH_USER_MODEL = 'users.User'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 FRONT_URL = 'http://18.193.203.105:8083'
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51HQ3ZXFunRLoLWctiy0l6VVOeflU8ES2IRjTyY7LL9rEpKedBIfOfKB1BSSftQk4Qmke8HdtRcdmje7R2whuWgTz00U7HXpwjn'

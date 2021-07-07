@@ -13,6 +13,7 @@ class StoreSerializer(serializers.ModelSerializer):
             'created_by', 
             'store_address',
             "is_active",
+            "image",
             "created_by",
             "created_at",
             "updated_at",

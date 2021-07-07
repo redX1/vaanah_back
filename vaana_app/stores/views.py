@@ -67,7 +67,8 @@ class StoreAPIView(APIView):
                     name=payload["name"],
                     created_by=user,
                     store_address=payload['store_address'],
-                    is_active= payload["is_active"]
+                    is_active= payload["is_active"],
+                    image= payload['image'],
                 )
                 serializer = StoreSerializer(store)
                 response['body'] = serializer.data

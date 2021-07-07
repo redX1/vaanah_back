@@ -12,4 +12,4 @@ class File(TimestampedModel):
         on_delete=models.SET_NULL,
         blank=True
     )
-    file = models.FileField()
+    file = models.FileField(unique=True)

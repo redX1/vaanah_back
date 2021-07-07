@@ -9,6 +9,7 @@ class Store(TimestampedModel):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True)
     store_address = models.CharField(max_length=100)
     is_active = models.BooleanField()
+    image = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ['name']

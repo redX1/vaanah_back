@@ -5,5 +5,10 @@ class FileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = File
-        fields = '__all__'
+        fields = [
+            "id",
+            "file",
+            "created_at",
+            "updated_at"
+        ]
 

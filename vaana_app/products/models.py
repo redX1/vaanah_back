@@ -6,6 +6,7 @@ from categories.models import Category
 from django.core.validators import MinValueValidator, MaxValueValidator
 from cores.models import TimestampedModel
 import uuid
+from files.models import File
 
 class Product(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -18,7 +19,7 @@ class Product(TimestampedModel):
     price = models.DecimalField(max_digits=15, decimal_places=3)
     quantity = models.IntegerField()
     is_active = models.BooleanField()
-    image = models.CharField(max_length=255)
+    images = models.ManyToManyField(File)
 
     class Meta:
         ordering = ('name',)

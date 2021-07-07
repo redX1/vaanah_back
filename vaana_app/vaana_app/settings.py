@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_yasg',
+    'django_mysql',
 
     'corsheaders',
     'django_extensions',
@@ -183,9 +184,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
-    'DEFAULT_PARSER_CLASSES': (
-        'rest_framework.parsers.FileUploadParser'
-    )
 }
 
 APPEND_SLASH=False

@@ -58,4 +58,6 @@ urlpatterns = [
 
     path('api/', include('wishlist.urls'), name='wishlist'),
 
+    path('api/', include('files.urls'), name='files'),
+
 ]

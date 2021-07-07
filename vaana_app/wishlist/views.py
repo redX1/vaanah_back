@@ -112,7 +112,7 @@ class WishListItemView(APIView):
             'body': {
                 'error': 'Action not allowed'
             },
-            'status': status.HTTP_400_BAD_REQUEST
+            'status': status.HTTP_401_UNAUTHORIZED
         }
 
         try:
@@ -120,13 +120,18 @@ class WishListItemView(APIView):
         except ObjectDoesNotExist:
             wishlist = WishList.objects.create(owner=user)
 
-        item = WishListItem.objects.create(product=product)
-                
-        wishlist.items.add(item)
-        response['body'] = WishListSerializer(wishlist).data
-        response['status'] = status.HTTP_201_CREATED
-                    
-        return JsonResponse(response['body'], status = response['status'])
+        if (wishlist.items.filter(product=product).exists()):
+            response['body']['error'] = 'Already in wishlist'
+            response['status'] = status.HTTP_401_UNAUTHORIZED
+        
+        else:
+            item = WishListItem.objects.create(product=product) 
+            wishlist.items.add(item)
+
+            response['body'] = WishListSerializer(wishlist).data
+            response['status'] = status.HTTP_201_CREATED
+                        
+        return JsonResponse(response['body'], status = response['status'], safe=False)
 
 
 class WishListItemUpdateView(RetrieveUpdateAPIView):
@@ -150,7 +155,6 @@ class WishListItemUpdateView(RetrieveUpdateAPIView):
                     
             try:
                 wishlist_item = WishListItem.objects.get(id=id)
-                wishlist_item.quantity = quantity
                 wishlist_item.save()
                 response['body'] = WishListSerializer(wishlist).data
                 response['status'] = status.HTTP_200_OK

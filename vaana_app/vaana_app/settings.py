@@ -72,7 +72,7 @@ INSTALLED_APPS = [
     'django_seed',
     'shippings',
     'payments',
-    'wishlists',
+    'wishlist',
     'images'
 ]
 
@@ -163,6 +163,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
@@ -194,3 +195,11 @@ AUTH_USER_MODEL = 'users.User'
 FRONT_URL = 'http://18.193.203.105:8083'
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51HQ3ZXFunRLoLWctiy0l6VVOeflU8ES2IRjTyY7LL9rEpKedBIfOfKB1BSSftQk4Qmke8HdtRcdmje7R2whuWgTz00U7HXpwjn'
 STRIPE_SECRET_KEY = 'sk_test_51HQ3ZXFunRLoLWctxxpIKhYLudKWPCFsLPQzDgKoR1UZykOkD8CIDkxT2GUrXC5aejGMQkTReqSrOCGGF6sUUBQo00Sz4ugrOQ'
+AWS_ACCESS_KEY_ID = 'AKIATDIHX42OI3R4PSXV'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'vaanahs3media'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_REGION_NAME = 'eu-central-1'
+AWS_LOCATION = 'static'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'

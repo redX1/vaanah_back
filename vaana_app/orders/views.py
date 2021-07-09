@@ -6,7 +6,7 @@ from carts.models import Cart
 from .models import Order, ShippingAddress
 from .serializers import OrderDetailsSerializer, OrderSerializer, SellerOrderSerializer, ShippingAddressSerializer
 from shippings.serializers import ShippingMethodSerializer
-from products.serializers import ProductSerializer
+from products.serializers import ProductResponseSerializer
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -86,7 +86,7 @@ class GetSellerOrderAPIView(APIView):
         return {
             'id': order.id,
             'number': order.number,
-            'products': ProductSerializer(products, many=True).data,
+            'products': ProductResponseSerializer(products, many=True).data,
             "currency": order.currency,
             "total_tax": order.total_tax,
             "shipping_tax": order.shipping_tax,

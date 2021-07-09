@@ -53,9 +53,9 @@ class InitiateOrderApiView(APIView):
                 )
             cart.status = Cart.SUBMITTED
             cart.save()
-            email_data = {'email_body': 'Your order ' + order.number + ' has been initiated, you can pay to confirm your order.', 'to_email': user.email,
+            """ email_data = {'email_body': 'Your order ' + order.number + ' has been initiated, you can pay to confirm your order.', 'to_email': user.email,
                 'email_subject': 'Order initiated'}
-            send_email(email_data)
+            send_email(email_data) """
             response = {
                 'body': OrderDetailsSerializer(order).data,
                 'status': status.HTTP_201_CREATED

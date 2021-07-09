@@ -134,7 +134,7 @@ class CartItemView(APIView):
 class CartItemUpdateView(RetrieveUpdateAPIView):
 
         @permission_classes([IsAuthenticated])
-        def update(self, request, id):
+        def put(self, request, id):
             user = request.user
             payload = json.loads(request.body)
             serializer = CartItemSerializer(data=payload)

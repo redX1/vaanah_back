@@ -5,7 +5,7 @@ from addresses.serializers import AddressSerializer
 from shippings.serializers import ShippingMethodSerializer
 from carts.models import Cart
 from carts.serializers import CartDetailsSerializer
-from products.serializers import ProductSerializer
+from products.serializers import ProductResponseSerializer
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
@@ -80,7 +80,7 @@ class OrderSerializer(serializers.ModelSerializer):
 class SellerOrderSerializer(serializers.Serializer):
     shipping_address = ShippingAddressSerializer()
     shipping_method = ShippingMethodSerializer()
-    products = ProductSerializer(many=True)
+    products = ProductResponseSerializer(many=True)
     class Meta:
         fields = [
             "id",

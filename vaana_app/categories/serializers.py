@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Category
-from products.serializers import ProductSerializer
+from products.serializers import ProductResponseSerializer
 
 class RecursiveField(serializers.Serializer):
     def to_representation(self, value):

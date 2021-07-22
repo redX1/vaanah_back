@@ -23,7 +23,7 @@ class StoreSearchAPIView(ListAPIView):
     serializer_class = StoreSerializer
     queryset  = Store.objects.all()
     filter_backends =  [SearchFilter,]
-    search_fields = ['^name']
+    search_fields = ['name']
 
 class LatestStoreAPIView(APIView):
     def get(self, request):

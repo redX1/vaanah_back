@@ -6,7 +6,7 @@ from carts.models import Cart
 from .models import Order, ShippingAddress
 from .serializers import OrderDetailsSerializer, OrderSerializer, SellerOrderSerializer, ShippingAddressSerializer
 from shippings.serializers import ShippingMethodSerializer
-from products.serializers import ProductSerializer
+from products.serializers import ProductResponseSerializer
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -53,9 +53,9 @@ class InitiateOrderApiView(APIView):
                 )
             cart.status = Cart.SUBMITTED
             cart.save()
-            email_data = {'email_body': 'Your order ' + order.number + ' has been initiated, you can pay to confirm your order.', 'to_email': user.email,
+            """ email_data = {'email_body': 'Your order ' + order.number + ' has been initiated, you can pay to confirm your order.', 'to_email': user.email,
                 'email_subject': 'Order initiated'}
-            send_email(email_data)
+            send_email(email_data) """
             response = {
                 'body': OrderDetailsSerializer(order).data,
                 'status': status.HTTP_201_CREATED
@@ -86,7 +86,7 @@ class GetSellerOrderAPIView(APIView):
         return {
             'id': order.id,
             'number': order.number,
-            'products': ProductSerializer(products, many=True).data,
+            'products': ProductResponseSerializer(products, many=True).data,
             "currency": order.currency,
             "total_tax": order.total_tax,
             "shipping_tax": order.shipping_tax,

@@ -26,7 +26,7 @@ class ProductSearchAPIView(ListAPIView):
     serializer_class = ProductResponseSerializer
     queryset  = Product.objects.all()
     filter_backends =  [SearchFilter,]
-    search_fields = ['^name']
+    search_fields = ['name', 'description']
 
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer

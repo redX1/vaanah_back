@@ -18,16 +18,20 @@ from django.conf import settings
 from cores.utils import *
 from carts.models import Cart
 from products.models import Product
+from funds.backends import FundController
+from wallets.backends import WalletController
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-def updateProductsQuantity(cart):
+def updateProductsQuantity(cart, payment, payment_intent_id):
     
     for item in cart.items.all():
         try:
             product = item.product
             product.quantity = product.quantity - item.quantity
             product.save()
+            wallet = WalletController().get(product.created_by)
+            FundController().create((product.price * item.quantity), 'EUR', cart.owner, payment, wallet, payment_intent_id)
             email_data = {
                 'email_body': str(item.quantity) + ' of your  product ' + product.name + ' have been ordered',
                 'to_email': product.created_by.email,
@@ -109,7 +113,7 @@ class ConfirmStripePayment(RetrieveUpdateAPIView):
                     email_data = {'email_body': 'Your order ' + order.number + ' has been confirmed.', 'to_email': user.email,
                 'email_subject': 'Order confirmed'}
                     send_email(email_data)
-                    updateProductsQuantity(order.cart)
+                    updateProductsQuantity(order.cart, payment, payment_intent_id)
                     response['body'] = OrderSerializer(order).data
                     response['status'] = status.HTTP_200_OK
                 except ObjectDoesNotExist:

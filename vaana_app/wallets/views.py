@@ -24,8 +24,11 @@ class WalletAPIView(APIView):
             'status': status.HTTP_403_FORBIDDEN
         }
         if user.account_type == User.SELLER:
-            wallet = Wallet.objects.create(seller=user)
-            response['body'] = WalletSerializer(wallet)
+            try:
+                wallet = Wallet.objects.get(seller=user)
+            except ObjectDoesNotExist:
+                wallet = Wallet.objects.create(seller=user)
+            response['body'] = WalletSerializer(wallet).data
             response['status'] = status.HTTP_201_CREATED
 
         return JsonResponse(response['body'], status = response['status'], safe=False)
@@ -46,7 +49,7 @@ class WalletAPIView(APIView):
             except ObjectDoesNotExist:
                 wallet = Wallet.objects.create(seller=user)
             
-            response['body'] = WalletSerializer(wallet)
+            response['body'] = WalletSerializer(wallet).data
             response['status'] = status.HTTP_201_CREATED
         
         return JsonResponse(response['body'], status = response['status'], safe=False)

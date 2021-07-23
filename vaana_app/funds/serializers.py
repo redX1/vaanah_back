@@ -9,8 +9,8 @@ class FundSerializer(serializers.ModelSerializer):
             'amount',
             'customer',
             'payment',
-            'order',
             'wallet',
             'payment_id',
-            'status'
+            'status',
+            'currency'
         ]

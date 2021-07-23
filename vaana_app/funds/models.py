@@ -9,11 +9,11 @@ from wallets.models import Wallet
 class Fund(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     amount = models.DecimalField(decimal_places=2, max_digits=12)
+    currency = models.CharField(max_length=12, default='EUR')
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     payment = models.ForeignKey(PaymentModel, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
-    payment_id = models.CharField(max_length=255)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name="funds")
+    payment_intent_id = models.CharField(max_length=255)
 
     COLLECTED, REFUNDED, TRANSFERED = (
         "collected", "refunded", "transfered"

@@ -13,6 +13,7 @@ class Fund(TimestampedModel):
     payment = models.ForeignKey(PaymentModel, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    payment_id = models.CharField(max_length=255)
 
     COLLECTED, REFUNDED, TRANSFERED = (
         "collected", "refunded", "transfered"

@@ -60,4 +60,6 @@ urlpatterns = [
 
     path('api/', include('files.urls'), name='files'),
 
+    path('api/', include('wallets.urls'), name='wallets'),
+
 ]

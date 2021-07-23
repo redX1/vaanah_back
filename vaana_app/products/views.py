@@ -21,12 +21,26 @@ from cores.utils import CustomPagination
 from users.models import User
 from files.models import File
 from rest_framework.filters import SearchFilter
-
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db import connection
+with connection.cursor() as cursor:
+    cursor.execute('CREATE EXTENSION IF NOT EXISTS pg_trgm')
 class ProductSearchAPIView(ListAPIView):
     serializer_class = ProductResponseSerializer
-    queryset  = Product.objects.all()
-    filter_backends =  [SearchFilter,]
-    search_fields = ['name', 'description']
+    # queryset  = Product.objects.all()
+    # filter_backends =  [SearchFilter,]
+    # search_fields = ['name', 'description']
+    def get(self, request):
+        key = self.request.query_params.get('search')
+        products = Product.objects.annotate(similarity=TrigramSimilarity('name', key),).filter(similarity__gt=0.1).order_by('-similarity')
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductResponseSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer

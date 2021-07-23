@@ -7,6 +7,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from cores.models import TimestampedModel
 import uuid
 from files.models import File
+from django.utils.text import slugify 
+from django.utils.timezone import now
 
 class Product(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -14,7 +16,7 @@ class Product(TimestampedModel):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True)
     name = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(null=True, blank=True, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=15, decimal_places=3)
     quantity = models.IntegerField()
@@ -27,6 +29,10 @@ class Product(TimestampedModel):
     def __str__(self):
         return self.name
     
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name + str(now()))
+        super(Product, self).save(*args, **kwargs)  
+
     def get_absolute_url(self):
         return f'/{self.category.slug}/{self.slug}/'
 

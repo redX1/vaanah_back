@@ -22,6 +22,7 @@ from users.models import User
 from files.models import File
 from rest_framework.filters import SearchFilter
 from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models.functions import Greatest
 from django.db import connection
 with connection.cursor() as cursor:
     cursor.execute('CREATE EXTENSION IF NOT EXISTS pg_trgm')
@@ -32,7 +33,7 @@ class ProductSearchAPIView(ListAPIView):
     # search_fields = ['name', 'description']
     def get(self, request):
         key = self.request.query_params.get('search')
-        products = Product.objects.annotate(similarity=TrigramSimilarity('name', key),).filter(similarity__gt=0.1).order_by('-similarity')
+        products = Product.objects.annotate(similarity=Greatest(TrigramSimilarity('name', key), TrigramSimilarity('description', key))).filter(similarity__gt=0.1).order_by('-similarity')
         paginator = PageNumberPagination()
 
         page_size = 20

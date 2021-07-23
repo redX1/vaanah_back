@@ -73,7 +73,9 @@ INSTALLED_APPS = [
     'shippings',
     'payments',
     'wishlist',
-    'files'
+    'files',
+    'funds',
+    'wallets'
 ]
 
 MIDDLEWARE = [
@@ -117,11 +119,11 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'release0',
         'USER': 'vaanah_user',
-        'PASSWORD': 'secretsecret',
-        'HOST': 'vaanahdb.cvamgenajfwz.eu-central-1.rds.amazonaws.com',
-        'PORT': '5432',
+        'PASSWORD': 'secret',
+        'HOST': 'localhost',
+        'PORT': '5433',
     }
 }
 

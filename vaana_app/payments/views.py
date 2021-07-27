@@ -31,7 +31,7 @@ def updateProductsQuantity(cart, payment, payment_intent_id):
             product.quantity = product.quantity - item.quantity
             product.save()
             wallet = WalletController().get(product.created_by)
-            FundController().create((product.price * item.quantity), 'EUR', cart.owner, payment, wallet, payment_intent_id)
+            FundController().create((product.price * item.quantity), 'EUR', cart.owner, payment, wallet, payment_intent_id, product)
             email_data = {
                 'email_body': str(item.quantity) + ' of your  product ' + product.name + ' have been ordered',
                 'to_email': product.created_by.email,

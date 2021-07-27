@@ -35,3 +35,7 @@ services:
     vaanah-test:
         build:
             context: .
+            dockerfile: Dockerfile.pytest
+        container_name: vaanah-test
+        networks:
+            - vaanah

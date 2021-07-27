@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - feature/autotest
 
 name: CICD for Vaanah-Backend
 jobs:

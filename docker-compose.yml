@@ -31,3 +31,7 @@ services:
             - "8000:8020"
         networks: 
             - vaanah
+    
+    vaanah-test:
+        build:
+            context: .

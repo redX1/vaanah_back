@@ -6,7 +6,7 @@ on:
 name: CICD for Vaanah-Backend
 jobs:
   build-and-push:
-    name: Vaanah-Backend pipeline
+    name: Build and Push image
     runs-on: ubuntu-latest
     steps:
 # Check status
@@ -18,7 +18,7 @@ jobs:
         echo "Current status is: $CURRENT_STATUS"
         while [ "${CURRENT_STATUS^^}" = "PENDING" ];
           do sleep 10;
-          CURRENT_STATUS=$(curl --url https://api.github.com/frontend-client/${{ github.repository }}/commits/${{ github.sha }}/status --header 'authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}' | jq -r '.state');
+          CURRENT_STATUS=$(curl --url https://api.github.com/vaanah/${{ github.repository }}/commits/${{ github.sha }}/status --header 'authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}' | jq -r '.state');
         done;
         echo "Current status is: $CURRENT_STATUS"
         if [ "${CURRENT_STATUS^^}" = "FAILURE" ];
@@ -59,6 +59,19 @@ jobs:
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
+
+  test:
+    name: Vaanah Test
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: docker-compose.yml
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: docker-compose run vaanah-test
 
 # Deploy to staging with Ansible Playbook
     - name: Play Ansible Playbook

@@ -9,7 +9,7 @@ on:
 # Deploy to staging with Ansible Playbook
 jobs:
   deploy:
-    name: Vaanah Test
+    name: Vaanah Deploy
     runs-on: ubuntu-latest
 
     steps:

@@ -2,9 +2,9 @@ name: Deploy Vaanah-Backend
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - feature/autotest
+  push:
+    branches:
+      - feature/autotest
 
 # Deploy to staging with Ansible Playbook
 jobs:

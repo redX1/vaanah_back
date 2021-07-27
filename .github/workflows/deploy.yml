@@ -1,0 +1,25 @@
+name: Deploy Vaanah-Backend
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - feature/autotest
+
+# Deploy to staging with Ansible Playbook
+jobs:
+  deploy:
+    name: Vaanah Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Play Ansible Playbook
+      uses: arillso/action.playbook@master
+      with:
+        playbook: iac/deploy_dev.yml
+        inventory: iac/hosts
+        private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+#         galaxy_file: tests/requirements.yml
+      env:
+        ANSIBLE_HOST_KEY_CHECKING: 'false'
+        ANSIBLE_DEPRECATION_WARNINGS: 'false'

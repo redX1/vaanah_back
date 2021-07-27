@@ -1,0 +1,20 @@
+name: Test Vaanah-Backend
+
+on:
+  push:
+    branches:
+      - feature/autotest
+
+jobs:
+  test:
+    name: Vaanah Test
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: docker-compose.yml
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: docker-compose run vaanah-test

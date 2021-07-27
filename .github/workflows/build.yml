@@ -1,9 +1,10 @@
+name: Build Vaanah-Backend
+
 on:
   push:
     branches:
       - feature/autotest
 
-name: CICD for Vaanah-Backend
 jobs:
   build-and-push:
     name: Build and Push image
@@ -59,28 +60,3 @@ jobs:
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
-
-  test:
-    name: Vaanah Test
-    runs-on: ubuntu-latest
-    env:
-      COMPOSE_FILE: docker-compose.yml
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Run tests
-      run: docker-compose run vaanah-test
-
-# Deploy to staging with Ansible Playbook
-    - name: Play Ansible Playbook
-      uses: arillso/action.playbook@master
-      with:
-        playbook: iac/deploy_dev.yml
-        inventory: iac/hosts
-        private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-#         galaxy_file: tests/requirements.yml
-      env:
-        ANSIBLE_HOST_KEY_CHECKING: 'false'
-        ANSIBLE_DEPRECATION_WARNINGS: 'false'

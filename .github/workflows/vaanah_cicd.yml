@@ -80,6 +80,7 @@ jobs:
   deploy:
     needs: test
     name: Vaanah Deploy
+    runs-on: ubuntu-latest
 
     steps:
     - name: Play Ansible Playbook

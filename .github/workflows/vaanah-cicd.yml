@@ -62,8 +62,8 @@ jobs:
       run: echo ${{ steps.docker_build.outputs.digest }}
 
 # Test application Image
-jobs:
   test:
+    needs: build-and-push
     name: Vaanah Test
     runs-on: ubuntu-latest
     env:
@@ -77,10 +77,9 @@ jobs:
       run: docker-compose run vaanah-test
 
 # Deploy to staging with Ansible Playbook
-jobs:
   deploy:
+    needs: test
     name: Vaanah Deploy
-    runs-on: ubuntu-latest
 
     steps:
     - name: Play Ansible Playbook

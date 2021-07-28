@@ -3,7 +3,7 @@ name: CICD Vaanah-Backend
 on:
   push:
     branches:
-      - feature/autotest
+      - develop
 
 jobs:
   build-and-push:

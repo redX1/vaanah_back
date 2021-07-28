@@ -6,6 +6,30 @@ on:
       - develop
 
 jobs:
+# Test application Image
+  test:
+#    needs: build-and-push
+    name: Vaanah Test
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: docker-compose.yml
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: docker-compose run vaanah-test
+
+# Cache Memory
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
   build-and-push:
     name: Vaanah Build and Push
     runs-on: ubuntu-latest
@@ -62,56 +86,48 @@ jobs:
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
 
-# Test application Image
-  test:
-    needs: build-and-push
-    name: Vaanah Test
-    runs-on: ubuntu-latest
-    env:
-      COMPOSE_FILE: docker-compose.yml
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Run tests
-      run: docker-compose run vaanah-test
-
-# Deploy to staging with Ansible Playbook
-#   deploy:
-#     needs: test
-#     name: Vaanah Deploy
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - name: Play Ansible Playbook
-#       uses: arillso/action.playbook@master
-#       with:
-#         playbook: iac/deploy_dev.yml
-#         inventory: iac/hosts
-#         private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-# #       galaxy_file: tests/requirements.yml
-#       env:
-#         ANSIBLE_HOST_KEY_CHECKING: 'false'
-#         ANSIBLE_DEPRECATION_WARNINGS: 'false'
 
 # Deploy to staging with Ansible Playbook
   deploy:
-#    needs: test
+    needs: build-and-push
     name: Vaanah Deploy
     runs-on: ubuntu-latest
 
     steps:
     - name: Play Ansible Playbook
-      uses: dawidd6/action-ansible-playbook@v2
+      uses: arillso/action.playbook@master
       with:
-        # Required, playbook filepath
-        playbook: deploy_dev.yml
-        # Optional, directory where playbooks live
-        # directory: iac
-        # Optional, SSH private key
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        # Optional, literal inventory file contents
-        inventory: |
-          [djangoserver]
-          ubuntu@3.126.109.165
+        playbook: iac/deploy_dev.yml
+        inventory: iac/hosts
+        private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+#       galaxy_file: tests/requirements.yml
+      env:
+        ANSIBLE_HOST_KEY_CHECKING: 'false'
+        ANSIBLE_DEPRECATION_WARNINGS: 'false'
+
+
+
+
+
+
+
+# # Deploy to staging with Ansible Playbook
+#   deploy:
+# #    needs: test
+#     name: Vaanah Deploy
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Play Ansible Playbook
+#       uses: dawidd6/action-ansible-playbook@v2
+#       with:
+#         # Required, playbook filepath
+#         playbook: deploy_dev.yml
+#         # Optional, directory where playbooks live
+#         # directory: iac
+#         # Optional, SSH private key
+#         key: ${{ secrets.SSH_PRIVATE_KEY }}
+#         # Optional, literal inventory file contents
+#         inventory: |
+#           [djangoserver]
+#           ubuntu@3.126.109.165

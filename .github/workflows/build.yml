@@ -31,6 +31,7 @@ jobs:
           ${{ runner.os }}-buildx-
 
   build-and-push:
+    needs: test
     name: Vaanah Build and Push
     runs-on: ubuntu-latest
     steps:

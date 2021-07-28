@@ -31,3 +31,11 @@ services:
             - "8000:8020"
         networks: 
             - vaanah
+    
+    vaanah-test:
+        build:
+            context: .
+            dockerfile: Dockerfile.pytest
+#        container_name: vaanah-app
+        networks:
+            - vaanah

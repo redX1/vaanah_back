@@ -1,12 +1,13 @@
+name: CICD Vaanah-Backend
+
 on:
   push:
     branches:
-      - main
+      - develop
 
-name: CICD for Vaanah-Backend
 jobs:
   build-and-push:
-    name: Vaanah-Backend pipeline
+    name: Vaanah Build and Push
     runs-on: ubuntu-latest
     steps:
 # Check status
@@ -18,7 +19,7 @@ jobs:
         echo "Current status is: $CURRENT_STATUS"
         while [ "${CURRENT_STATUS^^}" = "PENDING" ];
           do sleep 10;
-          CURRENT_STATUS=$(curl --url https://api.github.com/frontend-client/${{ github.repository }}/commits/${{ github.sha }}/status --header 'authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}' | jq -r '.state');
+          CURRENT_STATUS=$(curl --url https://api.github.com/vaanah/${{ github.repository }}/commits/${{ github.sha }}/status --header 'authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}' | jq -r '.state');
         done;
         echo "Current status is: $CURRENT_STATUS"
         if [ "${CURRENT_STATUS^^}" = "FAILURE" ];
@@ -60,14 +61,35 @@ jobs:
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
 
+# Test application Image
+  test:
+    needs: build-and-push
+    name: Vaanah Test
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: docker-compose.yml
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: docker-compose run vaanah-test
+
 # Deploy to staging with Ansible Playbook
+  deploy:
+    needs: test
+    name: Vaanah Deploy
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Play Ansible Playbook
       uses: arillso/action.playbook@master
       with:
-        playbook: iac/deploy_dev.yml
-        inventory: iac/hosts
+        playbook: ../../.iac/deploy_dev.yml
+        inventory: ../../.iac/hosts
         private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-#         galaxy_file: tests/requirements.yml
+#       galaxy_file: tests/requirements.yml
       env:
         ANSIBLE_HOST_KEY_CHECKING: 'false'
         ANSIBLE_DEPRECATION_WARNINGS: 'false'

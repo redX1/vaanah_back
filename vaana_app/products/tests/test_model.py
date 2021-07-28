@@ -24,7 +24,7 @@ class ProductModelTest(TestCase):
                 created_by = User.objects.create(username='user0', email='email0@im.com', password='test')
             ),
             # store = "",
-            image = "test",
+            # image = "test",
             quantity ="50"
         )
 

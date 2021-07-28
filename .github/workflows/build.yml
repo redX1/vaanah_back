@@ -102,7 +102,7 @@ jobs:
 
     steps:
     - name: Play Ansible Playbook
-      uses: dawidd6/action-ansible-playbook@v2
+      uses: ./
       with:
         # Required, playbook filepath
         playbook: deploy_dev.yml

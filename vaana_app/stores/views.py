@@ -85,7 +85,7 @@ class StoreProductsAPIView(APIView):
     
     def get(self, request, store_id):
         try:
-            store = Store.object.get(id=store_id, is_active=True)
+            store = Store.objects.get(id=store_id, is_active=True)
             products = Product.objects.filter(store=store)
             paginator = CustomPagination()
 

@@ -106,9 +106,9 @@ jobs:
       uses: dawidd6/action-ansible-playbook@v2
       with:
         # Required, playbook filepath
-        playbook: iac/deploy_dev.yml
+        playbook: deploy_dev.yml
         # Optional, directory where playbooks live
-        directory: ./
+        directory: ./iac/
         # Optional, SSH private key
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         # Optional, literal inventory file contents

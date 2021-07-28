@@ -98,16 +98,16 @@ jobs:
   deploy:
     needs: test
     name: Vaanah Deploy
-    runs-on: ubuntu-latest
+#    runs-on: ubuntu-latest
 
     steps:
     - name: Play Ansible Playbook
-      uses: ./
+      uses: dawidd6/action-ansible-playbook@v2
       with:
         # Required, playbook filepath
         playbook: deploy_dev.yml
         # Optional, directory where playbooks live
-        directory: iac
+        # directory: iac
         # Optional, SSH private key
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         # Optional, literal inventory file contents

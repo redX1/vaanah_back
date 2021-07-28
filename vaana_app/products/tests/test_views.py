@@ -31,7 +31,7 @@ class ProductTest(TestCase):
                             store_address = "Lorem ipsum ",
                             is_active = "True"
                         ),
-            #image = "test",
+            # image = "test",
             quantity ="50"
         )
         self.product.save()

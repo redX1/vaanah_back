@@ -86,7 +86,6 @@ jobs:
 #     - name: Play Ansible Playbook
 #       uses: arillso/action.playbook@master
 #       with:
-#         module_path: ./
 #         playbook: iac/deploy_dev.yml
 #         inventory: iac/hosts
 #         private_key: ${{ secrets.SSH_PRIVATE_KEY }}

@@ -8,7 +8,7 @@ class RecursiveField(serializers.Serializer):
         return serializer.data
 
 class CategorySerializer(serializers.ModelSerializer):
-    # products = ProductSerializer(many=True)
+    products = ProductResponseSerializer(many=True)
     children = RecursiveField(many=True,allow_null=True)
     class Meta:
         model = Category
@@ -24,5 +24,5 @@ class CategorySerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "children",
-            # "products",
+            "products",
         ]

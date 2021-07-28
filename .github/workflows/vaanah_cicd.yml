@@ -77,6 +77,25 @@ jobs:
       run: docker-compose run vaanah-test
 
 # Deploy to staging with Ansible Playbook
+#   deploy:
+#     needs: test
+#     name: Vaanah Deploy
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Play Ansible Playbook
+#       uses: arillso/action.playbook@master
+#       with:
+#         module_path: ./
+#         playbook: iac/deploy_dev.yml
+#         inventory: iac/hosts
+#         private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+# #       galaxy_file: tests/requirements.yml
+#       env:
+#         ANSIBLE_HOST_KEY_CHECKING: 'false'
+#         ANSIBLE_DEPRECATION_WARNINGS: 'false'
+
+# Deploy to staging with Ansible Playbook
   deploy:
     needs: test
     name: Vaanah Deploy
@@ -84,14 +103,15 @@ jobs:
 
     steps:
     - name: Play Ansible Playbook
-      uses: arillso/action.playbook@master
+      uses: dawidd6/action-ansible-playbook@v2
       with:
-        module_path: ./
+        # Required, playbook filepath
         playbook: iac/deploy_dev.yml
-        inventory: iac/hosts
-        private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-#       galaxy_file: tests/requirements.yml
-      env:
-        ANSIBLE_HOST_KEY_CHECKING: 'false'
-        ANSIBLE_DEPRECATION_WARNINGS: 'false'
-
+        # Optional, directory where playbooks live
+        directory: ./
+        # Optional, SSH private key
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        # Optional, literal inventory file contents
+        inventory: |
+          [djangoserver]
+          ubuntu@3.126.109.165

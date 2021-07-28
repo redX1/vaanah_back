@@ -28,10 +28,6 @@ class Product(TimestampedModel):
     
     def __str__(self):
         return self.name
-    
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name + str(now()))
-        super(Product, self).save(*args, **kwargs)  
 
     def get_absolute_url(self):
         return f'/{self.category.slug}/{self.slug}/'

@@ -2,7 +2,7 @@ from django.db import models
 from cores.models import TimestampedModel
 import uuid
 from django.conf import settings
-from orders.models import Order
+from products.models import Product
 from payments.models import PaymentModel
 from wallets.models import Wallet
 
@@ -14,15 +14,18 @@ class Fund(TimestampedModel):
     payment = models.ForeignKey(PaymentModel, on_delete=models.CASCADE)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name="funds")
     payment_intent_id = models.CharField(max_length=255)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
-    COLLECTED, REFUNDED, TRANSFERED = (
-        "collected", "refunded", "transfered"
+
+    COLLECTED, REFUNDED, TRANSFERED, READY = (
+        "collected", "refunded", "transfered", "ready"
     )
 
     STATUS = [
         (COLLECTED, "collected"),
         (REFUNDED, "refunded"),
-        (TRANSFERED, "trensfered")
+        (TRANSFERED, "trensfered"),
+        (READY, "ready")
     ]
 
     status = models.CharField(max_length=100, default=COLLECTED, choices=STATUS)

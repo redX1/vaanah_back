@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - develop
+
 name: CICD for Vaanah-Backend
 jobs:
   build-and-push:

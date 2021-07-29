@@ -6,8 +6,24 @@ on:
       - feature/autotest
 
 jobs:
-  build-and-push:
-    name: Vaanah Build and Push
+# Test application Image
+  test:
+#    needs: build-and-push
+    name: Vaanah Test
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: docker-compose.yml
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: docker-compose run vaanah-test
+
+  build-and-deploy:
+    needs: test
+    name: Vaanah Build and Deploy
     runs-on: ubuntu-latest
     steps:
 # Check status
@@ -61,28 +77,13 @@ jobs:
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
 
-# Test application Image
-  test:
-    needs: build-and-push
-    name: Vaanah Test
-    runs-on: ubuntu-latest
-    env:
-      COMPOSE_FILE: docker-compose.yml
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Run tests
-      run: docker-compose run vaanah-test
-
 # Deploy to staging with Ansible Playbook
-  deploy:
-    needs: test
-    name: Vaanah Deploy
-    runs-on: ubuntu-latest
+  # deploy:
+  #   needs: build-and-deploy
+  #   name: Vaanah Deploy
+  #   runs-on: ubuntu-latest
 
-    steps:
+  #   steps:
     - name: Play Ansible Playbook
       uses: arillso/action.playbook@master
       with:
@@ -93,3 +94,5 @@ jobs:
       env:
         ANSIBLE_HOST_KEY_CHECKING: 'false'
         ANSIBLE_DEPRECATION_WARNINGS: 'false'
+
+

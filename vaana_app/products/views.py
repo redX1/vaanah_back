@@ -1,13 +1,13 @@
 from django.db.models import Q
-from django.http import Http404
+from rest_framework import pagination
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from rest_framework.views import APIView
 from rest_framework.generics import  RetrieveUpdateAPIView, ListAPIView
-from rest_framework.response import Response
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import serializers, status
@@ -26,22 +26,40 @@ from django.db.models.functions import Greatest
 from django.db import connection
 with connection.cursor() as cursor:
     cursor.execute('CREATE EXTENSION IF NOT EXISTS pg_trgm')
+
+class CustomPagination(pagination.PageNumberPagination):
+    def get_paginated_response(self, data, similarities):
+        return Response(
+            {
+            'count': self.page.paginator.count,
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'similarities': similarities,
+            'results': data
+            }
+        )
 class ProductSearchAPIView(ListAPIView):
     serializer_class = ProductResponseSerializer
-    # queryset  = Product.objects.all()
-    # filter_backends =  [SearchFilter,]
-    # search_fields = ['name', 'description']
+  
     def get(self, request):
+        queryset  = Product.objects.all()
+        sims = False
         key = self.request.query_params.get('search')
-        products = Product.objects.annotate(similarity=Greatest(TrigramSimilarity('name', key), TrigramSimilarity('description', key))).filter(similarity__gt=0.1).order_by('-similarity')
-        paginator = PageNumberPagination()
+        products = queryset.filter(Q(name__istartswith = key) | Q(description__istartswith = key))
+        similarities = Product.objects.annotate(similarity=Greatest(TrigramSimilarity('name', key), TrigramSimilarity('description', key))).filter(similarity__gt=0.2).order_by('-similarity')
+
+        paginator = CustomPagination()
 
         page_size = 20
-        paginator.page_size = page_size        
-        page = paginator.paginate_queryset(products, request)
+        paginator.page_size = page_size  
+        if products:
+            page = paginator.paginate_queryset(products, request)
+        else:
+            sims = True
+            page = paginator.paginate_queryset(similarities, request)
 
         serializer = ProductResponseSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(serializer.data, sims)
 
 class ProductAPIView(APIView):
     serializer_class = ProductSerializer

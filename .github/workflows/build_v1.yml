@@ -3,7 +3,7 @@ name: CICD Vaanah-Backend
 on:
   push:
     branches:
-      - develop #Subject to change
+      - main #Subject to change
 
 jobs:
   build-and-push:

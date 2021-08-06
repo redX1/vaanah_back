@@ -45,8 +45,8 @@ class ProductSearchAPIView(ListAPIView):
         queryset  = Product.objects.all()
         sims = False
         key = self.request.query_params.get('search')
-        products = queryset.filter(Q(name__istartswith = key) | Q(description__istartswith = key))
-        similarities = Product.objects.annotate(similarity=Greatest(TrigramSimilarity('name', key), TrigramSimilarity('description', key))).filter(similarity__gt=0.2).order_by('-similarity')
+        products = queryset.filter(Q(name__istartswith = key) | Q(description__icontains = key))
+        similarities = Product.objects.annotate(similarity=Greatest(TrigramSimilarity('name', key), TrigramSimilarity('description', key))).filter(similarity__gt=0.15).order_by('-similarity')
 
         paginator = CustomPagination()
 

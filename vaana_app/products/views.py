@@ -15,7 +15,7 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Product, Category, Review, Store
-from .serializers import ProductResponseSerializer, ProductSerializer, ReviewSerializer
+from .serializers import ProductResponseSerializer, ProductSerializer, ReviewResultSerializer, ReviewSerializer
 from django.utils.timezone import now
 from cores.utils import CustomPagination
 from users.models import User
@@ -217,7 +217,7 @@ class ProductReviewsAPIView(APIView):
             paginator.page_size = 20        
             page = paginator.paginate_queryset(reviews, request)
 
-            serializer = ReviewSerializer(page, many=True)
+            serializer = ReviewResultSerializer(page, many=True)
             response = {
                 'body': paginator.get_paginated_response(serializer.data),
                 'status': status.HTTP_200_OK
@@ -248,7 +248,7 @@ class ProductReviewsAPIView(APIView):
                 user=user
             )
             response = {
-                'body': ReviewSerializer(review).data,
+                'body': ReviewResultSerializer(review).data,
                 'status': status.HTTP_201_CREATED
             }
         except Exception as e:
@@ -264,7 +264,7 @@ class ReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, review_id):
         try:
             review = Review.objects.get(id=review_id)
-            serializer = ReviewSerializer(review)
+            serializer = ReviewResultSerializer(review)
             response = {
                     'body': serializer.data,
                     'status': status.HTTP_200_OK
@@ -289,7 +289,7 @@ class ReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
                 updated_at=now()
                 )
             review = Review.objects.get(id=review_id)
-            serializer = ReviewSerializer(review)
+            serializer = ReviewResultSerializer(review)
             response = {
                     'body': serializer.data,
                     'status': status.HTTP_200_OK

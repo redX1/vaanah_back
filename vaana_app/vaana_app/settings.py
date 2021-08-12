@@ -67,7 +67,6 @@ INSTALLED_APPS = [
     'carts',
     'orders',
     'addresses',
-    'emails',
     'countries',
     'django_seed',
     'shippings',

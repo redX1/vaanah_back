@@ -2,7 +2,7 @@ from .models import PaymentModel
 from django.core.exceptions import ObjectDoesNotExist
 from stripe.api_resources import line_item
 from orders.models import Order
-from orders.serializers import OrderSerializer
+from orders.serializers import OrderDetailsSerializer
 from .serializers import PaymentSerializer, StripePaymentIntentConfirmSerializer
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
@@ -114,7 +114,7 @@ class ConfirmStripePayment(RetrieveUpdateAPIView):
                 'email_subject': 'Order confirmed'}
                     send_email(email_data)
                     updateProductsQuantity(order.cart, payment, payment_intent_id)
-                    response['body'] = OrderSerializer(order).data
+                    response['body'] = OrderDetailsSerializer(order).data
                     response['status'] = status.HTTP_200_OK
                 except ObjectDoesNotExist:
                     response['body']['error']= 'Order or payment not founded'

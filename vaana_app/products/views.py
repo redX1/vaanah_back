@@ -14,8 +14,8 @@ from rest_framework import serializers, status
 import json
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Product, Category, Review, Store
-from .serializers import ProductResponseSerializer, ProductSerializer, ReviewSerializer
+from .models import Product, Category, ProductReview, Store
+from .serializers import ProductResponseSerializer, ProductSerializer, ProductReviewResultSerializer, ProductReviewSerializer
 from django.utils.timezone import now
 from cores.utils import CustomPagination
 from users.models import User
@@ -207,17 +207,17 @@ class LatestProductAPIView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
 class ProductReviewsAPIView(APIView):
-    serializer_class = ReviewSerializer
+    serializer_class = ProductReviewSerializer
 
     def get(self, request, product_id):
         try:
             product = Product.objects.get(id=product_id, is_active=True)
-            reviews = Review.objects.filter(product=product)
+            reviews = ProductReview.objects.filter(product=product)
             paginator = CustomPagination()
             paginator.page_size = 20        
             page = paginator.paginate_queryset(reviews, request)
 
-            serializer = ReviewSerializer(page, many=True)
+            serializer = ProductReviewResultSerializer(page, many=True)
             response = {
                 'body': paginator.get_paginated_response(serializer.data),
                 'status': status.HTTP_200_OK
@@ -236,11 +236,11 @@ class ProductReviewsAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
-        serializer = ReviewSerializer(data=payload)
+        serializer = ProductReviewSerializer(data=payload)
         serializer.is_valid(raise_exception=True)
         try:
             product = Product.objects.get(id=payload['product'])
-            review = Review.objects.create(
+            review = ProductReview.objects.create(
                 title=payload["title"],
                 comment=payload["comment"],
                 rating=payload["rating"],
@@ -248,7 +248,7 @@ class ProductReviewsAPIView(APIView):
                 user=user
             )
             response = {
-                'body': ReviewSerializer(review).data,
+                'body': ProductReviewResultSerializer(review).data,
                 'status': status.HTTP_201_CREATED
             }
         except Exception as e:
@@ -260,11 +260,11 @@ class ProductReviewsAPIView(APIView):
             }
         return JsonResponse(response['body'], status=response['status'], safe=False)
 
-class ReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
+class ProductReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, review_id):
         try:
-            review = Review.objects.get(id=review_id)
-            serializer = ReviewSerializer(review)
+            review = ProductReview.objects.get(id=review_id)
+            serializer = ProductReviewResultSerializer(review)
             response = {
                     'body': serializer.data,
                     'status': status.HTTP_200_OK
@@ -283,13 +283,13 @@ class ReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
         user = request.user
         payload = json.loads(request.body)
         try:
-            review_item = Review.objects.filter(user=user, id=review_id)
+            review_item = ProductReview.objects.filter(user=user, id=review_id)
             review_item.update(
                 **payload,
                 updated_at=now()
                 )
-            review = Review.objects.get(id=review_id)
-            serializer = ReviewSerializer(review)
+            review = ProductReview.objects.get(id=review_id)
+            serializer = ProductReviewResultSerializer(review)
             response = {
                     'body': serializer.data,
                     'status': status.HTTP_200_OK
@@ -307,7 +307,7 @@ class ReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def delete(self, request, review_id):
         user = request.user
         try:
-            review = Review.objects.get(user=user, id=review_id)
+            review = ProductReview.objects.get(user=user, id=review_id)
             review.delete()
             response = {
                 'body': 'Success',

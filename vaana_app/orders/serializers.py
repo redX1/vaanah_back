@@ -1,10 +1,10 @@
 from rest_framework import fields, serializers
-from .models import Order, ShippingAddress
+from .models import Order, OrderItem, ShippingAddress
 
 from addresses.serializers import AddressSerializer
 from shippings.serializers import ShippingMethodSerializer
 from carts.models import Cart
-from carts.serializers import CartDetailsSerializer
+from carts.serializers import CartDetailsSerializer, CartItemDetailsSerializer
 from products.serializers import ProductResponseSerializer
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
@@ -17,6 +17,22 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
             "phone_number",
             "notes",
             "address",
+            "created_at",
+            "updated_at",
+        ]
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    cart_item = CartItemDetailsSerializer()
+    class Meta:
+        model = OrderItem
+        fields = [
+            "id",
+            "number",
+            "order",
+            "cart_item",
+            "amount",
+            "status",
+            "currency",
             "created_at",
             "updated_at",
         ]
@@ -76,38 +92,18 @@ class OrderSerializer(serializers.ModelSerializer):
             'shipping_method': shipping_method
         }
 
-
-class SellerOrderSerializer(serializers.Serializer):
-    shipping_address = ShippingAddressSerializer()
-    shipping_method = ShippingMethodSerializer()
-    products = ProductResponseSerializer(many=True)
-    class Meta:
-        fields = [
-            "id",
-            "number",
-            "products"
-            "user",
-            "currency",
-            "total_tax",
-            "shipping_tax",
-            "total_prices",
-            "shipping_address",
-            "shipping_method",
-            "status",
-            "created_at",
-            "updated_at",
-        ]
-    
 class OrderDetailsSerializer(serializers.ModelSerializer):
     shipping_address = ShippingAddressSerializer()
     shipping_method = ShippingMethodSerializer()
     cart = CartDetailsSerializer()
+    order_items = OrderItemSerializer(many=True)
     class Meta:
         model = Order
         fields = [
             "id",
             "number",
             "cart",
+            "order_items",
             "user",
             "currency",
             "total_tax",

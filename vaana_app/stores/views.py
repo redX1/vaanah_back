@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .serializers import StoreReviewResultSerializer, StoreReviewSerializer, StoreSerializer
+from .serializers import StoreResponseSerializer, StoreReviewResultSerializer, StoreReviewSerializer, StoreSerializer
 from .models import Store, StoreReview
 from rest_framework import serializers, status
 
@@ -46,7 +46,7 @@ class StoreAPIView(APIView):
         paginator.page_size = page_size        
         page = paginator.paginate_queryset(stores, request)
 
-        serializer = StoreSerializer(page, many=True)
+        serializer = StoreResponseSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
     @permission_classes([IsAuthenticated])
@@ -70,7 +70,7 @@ class StoreAPIView(APIView):
                     is_active= payload["is_active"],
                     image= payload['image'],
                 )
-                serializer = StoreSerializer(store)
+                serializer = StoreResponseSerializer(store)
                 response['body'] = serializer.data
                 response['status'] = status.HTTP_201_CREATED
             except Exception as e:
@@ -110,7 +110,7 @@ class StoreUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, store_id):
         try:
             store = Store.objects.get(id=store_id, is_active=True)
-            serializer = StoreSerializer(store)
+            serializer = StoreResponseSerializer(store)
             response = {
                 'body': serializer.data,
                 'status': status.HTTP_200_OK
@@ -135,7 +135,7 @@ class StoreUpdateDeleteAPIView(RetrieveUpdateAPIView):
                 updated_at=now()
                 )
             store = Store.objects.get(id=store_id)
-            serializer = StoreSerializer(store)
+            serializer = StoreResponseSerializer(store)
             response = {
                 'body': serializer.data,
                 'status': status.HTTP_200_OK
@@ -177,7 +177,7 @@ class SellerStoreAPIView(APIView):
         paginator = PageNumberPagination()
         paginator.page_size = 20        
         page = paginator.paginate_queryset(stores, request)
-        serializer = StoreSerializer(page, many=True)
+        serializer = StoreResponseSerializer(page, many=True)
 
         return paginator.get_paginated_response(serializer.data)
 

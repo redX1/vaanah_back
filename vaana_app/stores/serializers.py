@@ -33,9 +33,25 @@ class StoreReviewSerializer(serializers.ModelSerializer):
         ]
         
 class StoreSerializer(serializers.ModelSerializer):
-    products = ProductResponseSerializer(many=True)
-    reviews = StoreReviewSerializer(many=True)
+   
+    class Meta:
+        model = Store
+        fields = [
+            'id', 
+            'name', 
+            'created_by', 
+            'store_address',
+            "is_active",
+            "image",
+            "rating",
+            "created_by",
+            "created_at",
+            "updated_at",
+        ]
 
+class StoreResponseSerializer(serializers.ModelSerializer):
+    products = ProductResponseSerializer(many=True)
+    reviews = StoreReviewResultSerializer(many=True)
     class Meta:
         model = Store
         fields = [
@@ -53,5 +69,3 @@ class StoreSerializer(serializers.ModelSerializer):
             "reviews",
 
         ]
-
-

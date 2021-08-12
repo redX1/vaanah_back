@@ -58,6 +58,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         return Product.objects.create_user(**validated_data)
+        
 class ProductResponseSerializer(serializers.ModelSerializer):
     reviews = ProductReviewResultSerializer(many=True)
     images = FileSerializer(many=True)

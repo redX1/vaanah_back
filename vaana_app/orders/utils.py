@@ -10,5 +10,5 @@ class Util:
         rand_nb = ''.join(random.choice(digits) for i in range(2))
         rand_str = ''.join(random.choice(letters) for i in range(3))
 
-        return strn + rand_nb +rand_str
+        return strn + rand_nb + rand_str
 

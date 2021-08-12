@@ -1,7 +1,23 @@
+from users.serializers import UserSerializer
 from rest_framework import serializers
 from .models import Product, Review
 from files.serializers import FileSerializer
 
+class ReviewResultSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Review
+        fields = [
+            "id",
+            "title",
+            "comment",
+            "rating",
+            "product",
+            "user",
+            "created_at",
+            "updated_at",
+        ]
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -42,7 +58,7 @@ class ProductSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Product.objects.create_user(**validated_data)
 class ProductResponseSerializer(serializers.ModelSerializer):
-    reviews = ReviewSerializer(many=True)
+    reviews = ReviewResultSerializer(many=True)
     images = FileSerializer(many=True)
 
     class Meta:

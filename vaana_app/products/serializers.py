@@ -1,13 +1,13 @@
 from users.serializers import UserSerializer
 from rest_framework import serializers
-from .models import Product, Review
+from .models import Product, ProductReview
 from files.serializers import FileSerializer
 
-class ReviewResultSerializer(serializers.ModelSerializer):
+class ProductReviewResultSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
-        model = Review
+        model = ProductReview
         fields = [
             "id",
             "title",
@@ -18,9 +18,9 @@ class ReviewResultSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-class ReviewSerializer(serializers.ModelSerializer):
+class ProductReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Review
+        model = ProductReview
         fields = [
             "id",
             "title",
@@ -31,8 +31,9 @@ class ReviewSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+        
 class ProductSerializer(serializers.ModelSerializer):
-    reviews = ReviewSerializer(many=True)
+    reviews = ProductReviewSerializer(many=True)
     images = serializers.ListField()
 
     class Meta:
@@ -58,7 +59,7 @@ class ProductSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Product.objects.create_user(**validated_data)
 class ProductResponseSerializer(serializers.ModelSerializer):
-    reviews = ReviewResultSerializer(many=True)
+    reviews = ProductReviewResultSerializer(many=True)
     images = FileSerializer(many=True)
 
     class Meta:

@@ -48,8 +48,6 @@ urlpatterns = [
     
     path('api/', include('carts.urls'), name='carts'),
 
-    path('api/', include('emails.urls'), name='emails'),
-
     path('api/', include('countries.urls'), name='countries'),
 
     path('api/', include('orders.urls'), name='orders'),

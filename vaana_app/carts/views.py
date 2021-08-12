@@ -15,6 +15,7 @@ from rest_framework import status
 import json
 from django.core.exceptions import ObjectDoesNotExist
 from products.models import Product
+from .services import *
 
 
 from drf_yasg import openapi
@@ -89,7 +90,34 @@ class CartAddView(APIView):
                     'status': status.HTTP_500_INTERNAL_SERVER_ERROR
                 }
 
-        return JsonResponse(response['body'], status = response['status']) 
+        return JsonResponse(response['body'], status = response['status'])
+
+class CartUpdateAPIView(RetrieveUpdateAPIView):
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def put(self, request, id):
+        user = request.user
+        payload = json.loads(request.body)
+        cartService = CartService()
+        try:
+            cart = Cart.objects.get(id=id, owner=user, status = Cart.OPEN)
+        except ObjectDoesNotExist:
+            cart = Cart.objects.create(owner=user, status = Cart.OPEN)
+
+        for item in payload:
+            serializer = CartItemSerializer(data=item)
+            serializer.is_valid(raise_exception=True) 
+            product = Product.objects.get(id=item['product'])
+            if cartService.itemInCart(cart, product.id) and product.quantity > item['quantity']:
+                item = CartItem.objects.create(product=product, quantity=item['quantity'])
+                cart.items.add(item)
+        serializer = CartDetailsSerializer(cart)
+        response = {
+            'body': serializer.data,
+            'status': status.HTTP_200_OK
+        }
+        
+        return JsonResponse(response['body'], status = response['status'])
 
         
 class CartItemView(APIView):

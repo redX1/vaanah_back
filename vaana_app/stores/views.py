@@ -3,10 +3,10 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
-from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
 
-from .serializers import StoreSerializer
-from .models import Store
+from .serializers import StoreReviewResultSerializer, StoreReviewSerializer, StoreSerializer
+from .models import Store, StoreReview
 from rest_framework import serializers, status
 
 import json
@@ -180,3 +180,121 @@ class SellerStoreAPIView(APIView):
         serializer = StoreSerializer(page, many=True)
 
         return paginator.get_paginated_response(serializer.data)
+
+
+class StoreReviewsAPIView(APIView):
+    serializer_class = StoreReviewSerializer
+
+    def get(self, request, store_id):
+        try:
+            store = Store.objects.get(id=store_id, is_active=True)
+            reviews = StoreReview.objects.filter(store=store)
+            paginator = CustomPagination()
+            paginator.page_size = 20        
+            page = paginator.paginate_queryset(reviews, request)
+
+            serializer = StoreReviewResultSerializer(page, many=True)
+            response = {
+                'body': paginator.get_paginated_response(serializer.data),
+                'status': status.HTTP_200_OK
+            }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
+
+    @csrf_exempt
+    @permission_classes([IsAuthenticated])
+    def post(self, request):
+        payload = json.loads(request.body)
+        user = request.user
+        serializer = StoreReviewSerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+        try:
+            store = Store.objects.get(id=payload['store'])
+            review = StoreReview.objects.create(
+                title=payload["title"],
+                comment=payload["comment"],
+                rating=payload["rating"],
+                store=store,
+                user=user
+            )
+            response = {
+                'body': StoreReviewResultSerializer(review).data,
+                'status': status.HTTP_201_CREATED
+            }
+        except Exception as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
+
+class StoreReviewUpdateDeleteAPIView(RetrieveUpdateAPIView):
+    def get(self, request, review_id):
+        try:
+            review = StoreReview.objects.get(id=review_id)
+            serializer = StoreReviewResultSerializer(review)
+            response = {
+                    'body': serializer.data,
+                    'status': status.HTTP_200_OK
+                }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
+    
+    @permission_classes([IsAuthenticated])
+    def put(self, request, review_id):
+        user = request.user
+        payload = json.loads(request.body)
+        try:
+            review_item = StoreReview.objects.filter(user=user, id=review_id)
+            review_item.update(
+                **payload,
+                updated_at=now()
+                )
+            review = StoreReview.objects.get(id=review_id)
+            serializer = StoreReviewResultSerializer(review)
+            response = {
+                    'body': serializer.data,
+                    'status': status.HTTP_200_OK
+                }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
+
+    @permission_classes([IsAuthenticated])
+    def delete(self, request, review_id):
+        user = request.user
+        try:
+            review = StoreReview.objects.get(user=user, id=review_id)
+            review.delete()
+            response = {
+                'body': 'Success',
+                'status': status.HTTP_200_OK
+            }
+        except ObjectDoesNotExist as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
+

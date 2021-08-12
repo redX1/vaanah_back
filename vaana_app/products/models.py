@@ -1,9 +1,7 @@
 from django.conf import settings
 from django.db import models
-from django.db.models.aggregates import Avg
 from stores.models import Store
 from categories.models import Category
-from django.core.validators import MinValueValidator, MaxValueValidator
 from cores.models import TimestampedModel
 import uuid
 from files.models import File
@@ -35,13 +33,13 @@ class Product(TimestampedModel):
     @property
     def no_of_ratings(self):
         sum=0
-        reviews = Review.objects.filter(product=self)
+        reviews = ProductReview.objects.filter(product=self)
         return len(reviews)
 
     # @property
     def avg_rating(self):
         sum=0
-        reviews = Review.objects.filter(product=self)
+        reviews = ProductReview.objects.filter(product=self)
         for review in reviews:
             sum=sum+review.rating
 
@@ -52,7 +50,7 @@ class Product(TimestampedModel):
     
     rating = property(avg_rating)
 
-class Review(TimestampedModel):
+class ProductReview(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     comment = models.TextField()

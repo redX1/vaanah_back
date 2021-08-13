@@ -108,7 +108,7 @@ class CartUpdateAPIView(RetrieveUpdateAPIView):
             serializer = CartItemSerializer(data=item)
             serializer.is_valid(raise_exception=True) 
             product = Product.objects.get(id=item['product'])
-            if cartService.itemInCart(cart, product.id) and product.quantity > item['quantity']:
+            if cartService.itemInCart(cart, product.id) == False and product.quantity > item['quantity']:
                 item = CartItem.objects.create(product=product, quantity=item['quantity'])
                 cart.items.add(item)
         serializer = CartDetailsSerializer(cart)

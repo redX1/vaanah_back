@@ -42,11 +42,11 @@ class ProductSearchAPIView(ListAPIView):
     serializer_class = ProductResponseSerializer
   
     def get(self, request):
-        queryset  = Product.objects.all()
+        queryset  = Product.objects.filter(is_active=True)
         sims = False
         key = self.request.query_params.get('search')
         products = queryset.filter(Q(name__istartswith = key) | Q(description__icontains = key))
-        similarities = Product.objects.annotate(similarity=Greatest(TrigramSimilarity('name', key), TrigramSimilarity('description', key))).filter(similarity__gt=0.15).order_by('-similarity')
+        similarities = queryset.annotate(similarity=Greatest(TrigramSimilarity('name', key), TrigramSimilarity('description', key))).filter(similarity__gt=0.15).order_by('-similarity')
 
         paginator = CustomPagination()
 

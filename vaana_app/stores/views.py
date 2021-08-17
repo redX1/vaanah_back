@@ -109,7 +109,7 @@ class StoreProductsAPIView(APIView):
 class StoreUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, store_id):
         try:
-            store = Store.objects.get(id=store_id, is_active=True)
+            store = Store.objects.get(id=store_id)
             serializer = StoreResponseSerializer(store)
             response = {
                 'body': serializer.data,

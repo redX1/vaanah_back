@@ -31,7 +31,7 @@ class CategoryUpdateDeleteAPIView(RetrieveUpdateAPIView):
 
     def get(self, request, category_id):
         try:
-            category = Category.objects.get(id=category_id, is_active=True)
+            category = Category.objects.get(id=category_id)
             serializer = CategorySerializer(category)
             response = {
                 'body': serializer.data,

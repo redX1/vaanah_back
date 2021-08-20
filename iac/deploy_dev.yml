@@ -6,24 +6,20 @@
       update_cache: yes
       name: python3-pip
     become: yes
-
   - name: Install Docker
     apt:
       name: docker.io
     become: yes
-
   - name: Start Docker
     shell: |
       systemctl start docker
       systemctl enable docker
     become: yes
-
   - name: Pull Frontend app locally
     shell: |
       docker pull papeterinnova/vaana-django:latest
     become: yes
-
   - name: Run Image
     shell: |
-      docker run -d -p 8000:8020 --name vaana_backend_stable papeterinnova/vaana-django:latest
+      docker run -d -p 8080:8020 --name vaanah_test2 papeterinnova/vaana-django:latest
     become: yes

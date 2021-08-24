@@ -17,3 +17,4 @@ requests
 stripe
 django-storages
 boto3
+chatterbot

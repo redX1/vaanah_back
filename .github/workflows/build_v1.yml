@@ -26,10 +26,6 @@ jobs:
           exit 1;
         fi
 
-# Checkout Commit
-    - name: Checkout
-      uses: actions/checkout@v1
-
 # Cache Memory
     - name: Cache Docker layers
       uses: actions/cache@v2
@@ -46,6 +42,10 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+# Checkout Commit
+    - name: Checkout
+      uses: actions/checkout@v1
+
 # Docker Build and Push
     - name: Build and push
       id: docker_build
@@ -53,13 +53,20 @@ jobs:
       with:
         context: ./
         file: ./Dockerfile.django
-        builder: ${{ steps.buildx.outputs.name }}
+#        builder: ${{ steps.buildx.outputs.name }}
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vaana-django:latest
-
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
 # Digest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
+
+# Remove cach
+    - name: Move cache
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
 # Deploy to staging with Ansible Playbook
     - name: Play Ansible Playbook

@@ -43,7 +43,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,7 +73,9 @@ INSTALLED_APPS = [
     'wishlist',
     'files',
     'funds',
-    'wallets'
+    'wallets',
+
+    'chatterbot.ext.django_chatterbot',
 ]
 
 MIDDLEWARE = [
@@ -118,10 +119,10 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'vaanah_user',
-        'PASSWORD': 'secretsecret',
-        'HOST': 'vaanahdb.cvamgenajfwz.eu-central-1.rds.amazonaws.com',
+        'NAME': 'postgres6',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }

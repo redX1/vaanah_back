@@ -60,6 +60,7 @@ class OrderItem(TimestampedModel):
     cart_item = models.ForeignKey(CartItem, on_delete=models.CASCADE)
     amount = models.DecimalField(decimal_places=2, max_digits=12)
     currency = models.CharField(max_length=12, default='EUR')
+    payment_intent_id = models.CharField(max_length=255, default=None, blank=True, null=True)
     INITIATED, CONFIRMED, SHIPPED, DELIVERED, CANCELED = (
         "initiated", "confirmed", "shipped", "delivered", "canceled"
     )

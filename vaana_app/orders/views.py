@@ -3,7 +3,7 @@ from shippings.models import ShippingMethod
 from addresses.models import Address
 from carts.models import Cart
 from .models import Order, ShippingAddress
-from .serializers import OrderDetailsSerializer, OrderSerializer, ShippingAddressSerializer, OrderItemSerializer
+from .serializers import OrderDetailsSerializer, OrderItemDetailsSerializer, OrderSerializer, ShippingAddressSerializer, OrderItemSerializer
 from shippings.serializers import ShippingMethodSerializer
 from products.serializers import ProductResponseSerializer
 from rest_framework.views import APIView
@@ -18,6 +18,7 @@ from rest_framework.decorators import permission_classes
 from cores.utils import *
 from .services import *
 from django.utils.timezone import now
+from funds.backends import *
 
 
 class InitiateOrderApiView(APIView):
@@ -84,7 +85,7 @@ class GetSellerOrderAPIView(APIView):
         user = request.user
 
         orders = OrderItem.objects.filter(seller=user)
-        serializer = OrderItemSerializer(orders, many=True)
+        serializer = OrderItemDetailsSerializer(orders, many=True)
 
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
@@ -114,6 +115,7 @@ class OrderDetailsAPIView(APIView):
     @permission_classes([IsAuthenticated])
     def delete(self, request, id):
         user = request.user
+        fund = FundController()
 
         try:
             order_item = OrderItem.objects.get(id=id)
@@ -127,6 +129,7 @@ class OrderDetailsAPIView(APIView):
                 order_item.status = OrderItem.CANCELED
                 order_item.updated_at = now()
                 order_item.save()
+                fund.cancel(order_item.payment_intent_id)
                 response['body'] = OrderItemSerializer(order_item).data
                 response['status'] = status.HTTP_200_OK
         except ObjectDoesNotExist as e:

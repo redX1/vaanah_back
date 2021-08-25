@@ -14,4 +14,8 @@ class FundController(object):
         )
 
         return fund
+    
+    def cancel(self, payment_intent_id):
+        fund = Fund.objects.get(payment_intent_id=payment_intent_id)
+        fund.status = Fund.REFUNDED
 

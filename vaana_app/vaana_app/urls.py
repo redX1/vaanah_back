@@ -61,6 +61,5 @@ urlpatterns = [
     path('api/', include('wallets.urls'), name='wallets'),
     
     path('api/', include('chatbot.urls'), name='chatbot'),
-    # path('api/', include('chatterbot.ext.django_chatterbot.urls'), name='chatbot'),
 
 ]

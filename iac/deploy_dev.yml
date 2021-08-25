@@ -75,7 +75,7 @@
       pip:
         name: docker
 
-    - name: Pull Frontend app locally
+    - name: Pull Backend app locally
       shell: |
         docker pull papeterinnova/vaana-django:latest
       become: yes

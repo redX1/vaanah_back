@@ -1,25 +1,22 @@
 import json
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View
 from django.http import JsonResponse
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from chatterbot import ChatBot
 from chatterbot.ext.django_chatterbot import settings
-
-
+from chatterbot.trainers import ChatterBotCorpusTrainer
 class ChatterBotAPIView(APIView):
 
     chatterbot = ChatBot(**settings.CHATTERBOT)
-
-    # @csrf_exempt
+    trainer = ChatterBotCorpusTrainer(chatterbot)
+    trainer.train("chatbot/conversations.yml")
     @permission_classes([IsAuthenticated])
     def post(self, request, *args, **kwargs):
         """
         Return a response to the statement in the posted data.
         * The JSON data should contain a 'text' attribute.
-        """
+        """ 
         input_data = json.loads(request.body.decode('utf-8'))
 
         if 'text' not in input_data:

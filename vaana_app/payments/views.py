@@ -1,7 +1,7 @@
 from .models import PaymentModel
 from django.core.exceptions import ObjectDoesNotExist
 from stripe.api_resources import line_item
-from orders.models import Order
+from orders.models import Order, OrderItem
 from orders.serializers import OrderDetailsSerializer
 from .serializers import PaymentSerializer, StripePaymentIntentConfirmSerializer
 from django.shortcuts import render
@@ -85,6 +85,13 @@ class InitiateStripePayement(APIView):
         return JsonResponse(response['body'], status = response['status'], safe=False)
 
 class ConfirmStripePayment(RetrieveUpdateAPIView):
+    def updateOrderItemStatus(self, order, status, payment_intent_id):
+        items = OrderItem.objects.filter(order=order)
+        for item in items:
+            item.payment_intent_id = payment_intent_id
+            item.status = status
+            item.save()
+
     @csrf_exempt
     @permission_classes([IsAuthenticated])
     def update(self, request,payment_intent_id):
@@ -114,6 +121,7 @@ class ConfirmStripePayment(RetrieveUpdateAPIView):
                 'email_subject': 'Order confirmed'}
                     send_email(email_data)
                     updateProductsQuantity(order.cart, payment, payment_intent_id)
+                    self.updateOrderItemStatus(order, Order.CONFIRMED, payment_intent_id)
                     response['body'] = OrderDetailsSerializer(order).data
                     response['status'] = status.HTTP_200_OK
                 except ObjectDoesNotExist:

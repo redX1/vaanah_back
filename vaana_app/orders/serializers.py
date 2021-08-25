@@ -1,3 +1,4 @@
+from django.db import models
 from rest_framework import fields, serializers
 from .models import Order, OrderItem, ShippingAddress
 
@@ -29,6 +30,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "id",
             "number",
             "order",
+            "payment_intent_id",
             "cart_item",
             "amount",
             "status",
@@ -112,6 +114,24 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
             "shipping_address",
             "shipping_method",
             "status",
+            "created_at",
+            "updated_at",
+        ]
+
+class OrderItemDetailsSerializer(serializers.ModelSerializer):
+    cart_item = CartItemDetailsSerializer()
+    order = OrderSerializer()
+    class Meta:
+        model = OrderItem
+        fields = [
+            "id",
+            "number",
+            "payment_intent_id",
+            "order",
+            "cart_item",
+            "amount",
+            "status",
+            "currency",
             "created_at",
             "updated_at",
         ]

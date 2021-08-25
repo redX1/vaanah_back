@@ -43,7 +43,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,7 +73,9 @@ INSTALLED_APPS = [
     'wishlist',
     'files',
     'funds',
-    'wallets'
+    'wallets',
+
+    'chatterbot.ext.django_chatterbot',
 ]
 
 MIDDLEWARE = [

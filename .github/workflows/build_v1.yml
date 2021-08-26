@@ -56,17 +56,14 @@ jobs:
 #        builder: ${{ steps.buildx.outputs.name }}
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vaana-django:latest
+        # cache-from: type=gha
+        # cache-to: type=gha,mode=max
         # cache-from: type=local,src=/tmp/.buildx-cache
         # cache-to: type=local,dest=/tmp/.buildx-cache-new
+
 # # Digest
 #     - name: Image digest
 #       run: echo ${{ steps.docker_build.outputs.digest }}
-
-# # Remove cach
-#     - name: Move cache
-#       run: |
-#         rm -rf /tmp/.buildx-cache
-#         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
 # Deploy to staging with Ansible Playbook
     - name: Play Ansible Playbook

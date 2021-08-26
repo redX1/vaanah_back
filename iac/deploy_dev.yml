@@ -75,7 +75,7 @@
       pip:
         name: docker
 
-     - name: Kill Previous container
+    - name: Kill Previous container
       shell: |
         docker kill vaanah_test3
       become: yes

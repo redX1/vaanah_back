@@ -75,12 +75,7 @@
       pip:
         name: docker
 
-    - name: Pull Backend app locally
-      shell: |
-        docker pull papeterinnova/vaana-django:latest
-      become: yes
-
-    - name: Kill Previous container
+     - name: Kill Previous container
       shell: |
         docker kill vaanah_test3
       become: yes
@@ -93,6 +88,11 @@
           dangling: false
         volumes: yes
         builder_cache: yes
+
+    - name: Pull Backend app locally
+      shell: |
+        docker pull papeterinnova/vaana-django:latest
+      become: yes
 
     - name: Run Image
       shell: |

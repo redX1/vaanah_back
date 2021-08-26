@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - feature/vaana-773
 
 name: CICD for Vaanah-Backend
 jobs:

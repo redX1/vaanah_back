@@ -8,7 +8,7 @@ on:
 jobs:
 # Test application Image
   test:
-#    needs: build-and-push
+#    needs: build-and-push eddy is here
     name: Vaanah Test
     runs-on: ubuntu-latest
     env:

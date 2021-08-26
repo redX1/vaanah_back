@@ -33,6 +33,7 @@ class ChatterBotAPIView(APIView):
         return JsonResponse(response_data, status=200)
 
     def get(self, request, *args, **kwargs):
+        
         """
         Return data corresponding to the current conversation.
         """

@@ -19,3 +19,4 @@ django-storages
 boto3
 ChatterBot==1.0.4
 chatterbot-corpus==1.2.0
+nltk>=3.2,<4.0

@@ -4,13 +4,14 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.ext.django_chatterbot import settings
 # from chatterbot.trainers import ListTrainer
 class ChatterBotAPIView(APIView):
 
     chatterbot = ChatBot(**settings.CHATTERBOT)
-    # trainer = ListTrainer(chatterbot)
-    # trainer.train("chatbot/conversations.yml")
+    trainer = ChatterBotCorpusTrainer(chatterbot)
+    trainer.train("chatbot/conversations.yml")
     @permission_classes([IsAuthenticated])
     def post(self, request, *args, **kwargs):
         """

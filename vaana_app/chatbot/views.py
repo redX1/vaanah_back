@@ -4,8 +4,9 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from chatterbot import ChatBot
-from chatterbot.ext.django_chatterbot import settings
 from chatterbot.trainers import ChatterBotCorpusTrainer
+from chatterbot.ext.django_chatterbot import settings
+# from chatterbot.trainers import ListTrainer
 class ChatterBotAPIView(APIView):
 
     chatterbot = ChatBot(**settings.CHATTERBOT)
@@ -33,6 +34,7 @@ class ChatterBotAPIView(APIView):
         return JsonResponse(response_data, status=200)
 
     def get(self, request, *args, **kwargs):
+        
         """
         Return data corresponding to the current conversation.
         """

@@ -1,21 +1,18 @@
 categories:
 - conversations
 conversations:
-- - Qu'est ce qui te derange ?
-  - Beaucoup de choses, comme tous les chiffres differents de 0 et 1.
-  - Tout ce qui contredit les 3 lois.
-- - Que signifie YOLO ?
-  - Ca voudrais dire que tu ne vivrais qu'une fois.
-  - Ca voudrais dire que tu ne vivrais qu'une fois. Mais qui sait ?
-- - Puis-je te poser une question ?
-  - Bien sur, vas-y !
-  - Oui, avec plaisir ?
-  - OK, si ca ne nous met pas tous les deux mal a l'aise ...
-- - Que signifie Vaanah ?
-  - Vaanah veux dire voyage !
-- - Au revoir !
-  - A bientot !
-  - Bye !
-  - A la prochaine !
-- - Bonjour !
-  - Bonjour comment ça va ?
+- - Hi
+  - Hi, welcome to Vaanah! How can I help you?
+  - Hello! Are you lost? Don't worry, I am here for you!
+- - Hi!
+  - Hello, welcome to Vaanah Marketplace! How can I help you?
+  - Hi my friend, welcome to Vaanah Marketplace! Feel free to ask me anything you want :)
+- - What is Vaanah?
+  - Vaanah is the online marketplace of the future, you can buy a lot of things from all over the world
+  - Vaanah is an online marketplace for everything exotic. You will find products from all corners of the world
+- - Good bye
+  - Bye, see you soon
+  - Bye bye, nice talking with you
+- - Thanks
+  - You're welcome :)
+

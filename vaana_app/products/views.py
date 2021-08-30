@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.db.models import Q
 from rest_framework import pagination
 from rest_framework.pagination import PageNumberPagination
@@ -136,6 +137,8 @@ class ProductUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, product_id):
         try:
             product = Product.objects.get(id=product_id)
+            product.views += 1
+            product.save()
             serializer = ProductResponseSerializer(product)
             response = {
                 'body': serializer.data,
@@ -206,6 +209,17 @@ class LatestProductAPIView(APIView):
         serializer = ProductResponseSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
+class MostViewedProductAPIView(APIView):
+    def get(self, request):
+        products = Product.objects.annotate(views_count=Count('views')).order_by('-views')
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(products, request)
+
+        serializer = ProductResponseSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 class ProductReviewsAPIView(APIView):
     serializer_class = ProductReviewSerializer
 

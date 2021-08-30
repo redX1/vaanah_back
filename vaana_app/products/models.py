@@ -18,6 +18,7 @@ class Product(TimestampedModel):
     description = models.TextField()
     price = models.DecimalField(max_digits=15, decimal_places=3)
     quantity = models.IntegerField()
+    views = models.IntegerField(default=0)
     is_active = models.BooleanField()
     images = models.ManyToManyField(File)
 

@@ -1,3 +1,4 @@
+from backend.vaana_app.products import views
 from django.urls.base import reverse
 from ..models import Product
 from users.models import User
@@ -32,7 +33,8 @@ class ProductTest(TestCase):
                             is_active = "True"
                         ),
             # image = "test",
-            quantity ="50"
+            quantity ="50",
+            views = 1
         )
         self.product.save()
 

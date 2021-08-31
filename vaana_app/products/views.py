@@ -199,7 +199,7 @@ class ProductUpdateDeleteAPIView(RetrieveUpdateAPIView):
 
 class LatestProductAPIView(APIView):
     def get(self, request):
-        products = Product.objects.filter(is_active=True)[0:2]
+        products = Product.objects.filter(is_active=True).order_by('-created_at')
         paginator = PageNumberPagination()
 
         page_size = 20

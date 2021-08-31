@@ -119,10 +119,10 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'release0',
-        'USER': 'vaanah_user',
-        'PASSWORD': 'secretsecret',
-        'HOST': 'vaanahdb.cvamgenajfwz.eu-central-1.rds.amazonaws.com',
+        'NAME': 'postgres6',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }

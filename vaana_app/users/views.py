@@ -26,7 +26,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, UserSerializer, EmailVerificationSerializer
+    LoginSerializer, RegistrationSerializer, ResetPasswordEmailRequestSerializer, SellerRegistrationSerializer, SetNewPasswordSerializer, UserSerializer, EmailVerificationSerializer
 )
 
 
@@ -75,6 +75,43 @@ class SingleUserAPIView(APIView):
 class CustomRedirect(HttpResponsePermanentRedirect):
 
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
+
+class SellerRegistrationAPIView(APIView):
+    permission_classes = (AllowAny,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = SellerRegistrationSerializer
+
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        request_body=RegistrationSerializer,
+        security=[],
+        tags=['Users'],
+    )
+    def post(self, request):
+        user = request.data
+
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        user = User.objects.create_user(username=user['username'], email=user['email'], password=user['password'], account_type="Seller")
+       
+        token = RefreshToken.for_user(user).access_token
+        email = user.email
+        absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email        
+
+        context = {
+            "username": user.username, 
+            "email": email,
+            "absurl": absurl
+            }
+        html_template = get_template( "email_verify.html").render(context)
+
+        email_body = html_template 
+        data = {'email_body': email_body, 'to_email': user.email,
+                'email_subject': 'Verify your email'}
+
+        send_email(data)
+
+        return Response(RegistrationSerializer(user).data, status=status.HTTP_201_CREATED)
 
 class RegistrationAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.

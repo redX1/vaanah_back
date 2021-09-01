@@ -25,7 +25,8 @@ class ProductModelTest(TestCase):
             ),
             # store = "",
             # image = "test",
-            quantity ="50"
+            quantity ="50",
+            views = 1
         )
 
     # def test_wrong_product_fields(self):

@@ -1,8 +1,14 @@
+from django.test.testcases import SimpleTestCase
 from django.urls.base import reverse
 from ..models import Category
 from users.models import User
 from products.models import Product
 from django.test import TestCase
+
+class CategorySimpleTest(SimpleTestCase):
+    def test_url_status(self):
+        response = self.client.get('categories')
+        self.assertEquals(response.status_code, 404)
 
 class CategoryTest(TestCase):
 

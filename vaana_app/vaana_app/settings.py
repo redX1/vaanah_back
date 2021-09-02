@@ -75,7 +75,7 @@ INSTALLED_APPS = [
     'funds',
     'wallets',
 
-    'chatterbot.ext.django_chatterbot',
+    # 'chatterbot.ext.django_chatterbot',
 ]
 
 MIDDLEWARE = [

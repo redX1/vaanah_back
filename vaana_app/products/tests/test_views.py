@@ -1,4 +1,3 @@
-from backend.vaana_app.products import views
 from django.urls.base import reverse
 from ..models import Product
 from users.models import User

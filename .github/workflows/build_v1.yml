@@ -3,7 +3,7 @@ name: CICD Vaanah-Backend
 on:
   push:
     branches:
-      - feature/vaana-773
+      - main
 
 jobs:
 # Test application Image
@@ -77,4 +77,14 @@ jobs:
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
 
-# Test Workflow
+# Deploy to staging with Ansible Playbook
+    - name: Play Ansible Playbook
+      uses: arillso/action.playbook@master
+      with:
+        playbook: iac/deploy_dev.yml
+        inventory: iac/hosts
+        private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+#         galaxy_file: tests/requirements.yml
+      env:
+        ANSIBLE_HOST_KEY_CHECKING: 'false'
+        ANSIBLE_DEPRECATION_WARNINGS: 'false'

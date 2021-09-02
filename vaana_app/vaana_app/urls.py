@@ -62,4 +62,6 @@ urlpatterns = [
     
     path('api/', include('chatbot.urls'), name='chatbot'),
 
+    # path('api/', include('shippings.urls'), name='shippings'),
+
 ]

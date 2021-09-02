@@ -23,6 +23,10 @@ RUN [ "python", "-c", "import nltk; nltk.download('averaged_perceptron_tagger', 
 ENV NLTK_DATA /usr/local/nltk_data
 # RUN chmod -R 777 /root/nltk_data
 # start server
+RUN useradd -rm -d /home/vaanah -s /bin/bash -g root -G sudo -u 1001 vaanah
+USER vaanah
+WORKDIR /home/vaanah
+
 EXPOSE 8020
 STOPSIGNAL SIGTERM
 CMD ["/opt/app/start-server.sh"]

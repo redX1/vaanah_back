@@ -1,5 +1,5 @@
 ---
-- hosts: djangoserver
+- hosts: backendserver
   vars:
     ansible_user: ubuntu
 

@@ -2,8 +2,8 @@ from django.urls import path
 
 from . import views
 
-# urlpatterns = [
+urlpatterns = [
 
-#     path('shippings', views.ShipmentAPIVIew.as_view()),
+    path('carriers', views.ShippoCarrierAPIVIew.as_view()),
 
-# ]
+]

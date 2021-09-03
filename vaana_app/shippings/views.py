@@ -6,17 +6,19 @@ from rest_framework.views import APIView
 from rest_framework.generics import  RetrieveUpdateAPIView, ListAPIView
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import shippo
+from .backends import ShippoCarrierAPI
 
-''' class ShipmentAPIVIew(APIView):
+class ShippoCarrierAPIVIew(APIView):
     @csrf_exempt
-    def get(self, *args, **kwargs):
-        shippo.config.api_key = 'shippo_test_d88dfb2c748b3c9ea2483bded12428024b5f36e3'
+    def get(self, request, *args, **kwargs):
+        carrierApi = ShippoCarrierAPI()
+        page = request.query_params.get('page')
 
         try:
+            response = carrierApi.all(page)
             response = {
-                'body': shippo.CarrierAccount.all(),
-                'status': status.HTTP_200_OK
+                'body': response.json(),
+                'status': response.status_code
             }
         except Exception as e:
             response = {
@@ -24,4 +26,4 @@ import shippo
                 'status': status.HTTP_500_INTERNAL_SERVER_ERROR
             }
 
-        return JsonResponse(response['body'], status=response['status'], safe=False) '''
+        return JsonResponse(response['body'], status=response['status'], safe=False)

@@ -19,6 +19,7 @@ class CategoryTest(TestCase):
                                     slug = "foods",
                                     description = "Lorem ipsum dolor, sit amet consectetur adipisicing elit.",
                                     is_active = "True",
+                                    views = 1,
                                     created_by = self.user
                         )
         self.category.save()

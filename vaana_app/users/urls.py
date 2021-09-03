@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^users/?$', views.UserRetrieveUpdateAPIView.as_view() ),
     url(r'^users/register/?$', views.RegistrationAPIView.as_view(), name="register"),
     url(r'^users/seller-register/?$', views.SellerRegistrationAPIView.as_view(), name="seller-register"),
+    url(r'^users/become-seller/?$', views.BecomeSeller.as_view(), name="seller-register"),
     url(r'^users/login/?$', views.LoginAPIView.as_view(), name="login"),
     path('users/verify/', views.VerifyEmail.as_view(), name="email-verify"),
     path('users/resend/', views.ResendEmailAPI.as_view(), name="email-resend"),

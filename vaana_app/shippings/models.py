@@ -3,6 +3,8 @@ from django.db import models
 from cores.models import TimestampedModel
 import uuid
 
+class Carrier(TimestampedModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 # class Address(TimestampedModel):
 #     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 #     name = models.CharField(max_length=255)

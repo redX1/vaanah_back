@@ -20,6 +20,7 @@ class CategorySerializer(serializers.ModelSerializer):
             "parent",
             "image",
             "is_active",
+            "views",
             "created_by",
             "created_at",
             "updated_at",

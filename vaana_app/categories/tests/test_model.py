@@ -13,6 +13,7 @@ class CategoryModelTest(TestCase):
             slug = "foods",
             description = "Lorem ipsum dolor, sit amet consectetur adipisicing elit.",
             is_active = "True",
+            views = 1,
             created_by = User.objects.create(username='user', email='email@im.com', password='test')
         )
 

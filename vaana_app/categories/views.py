@@ -19,6 +19,7 @@ from products.serializers import ProductSerializer
 from django.utils.timezone import now
 from cores.utils import CustomPagination
 from rest_framework.filters import SearchFilter
+from django.db.models import Count
 
 class CategorySearchAPIView(ListAPIView):
     serializer_class = CategorySerializer
@@ -32,6 +33,8 @@ class CategoryUpdateDeleteAPIView(RetrieveUpdateAPIView):
     def get(self, request, category_id):
         try:
             category = Category.objects.get(id=category_id)
+            category.views += 1
+            category.save()
             serializer = CategorySerializer(category)
             response = {
                 'body': serializer.data,
@@ -144,7 +147,19 @@ class CategoryAPIView(APIView):
 
 class LatestCategoryAPIView(APIView):
     def get(self, request):
-        categories = Category.objects.filter(is_active=True)[0:2]
+        categories = Category.objects.filter(is_active=True).order_by('-created_at')
+        paginator = PageNumberPagination()
+
+        page_size = 20
+        paginator.page_size = page_size        
+        page = paginator.paginate_queryset(categories, request)
+
+        serializer = CategorySerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+class MostViewedCategoryAPIView(APIView):
+    def get(self, request):
+        categories = Category.objects.annotate(views_count=Count('views')).order_by('-views')
         paginator = PageNumberPagination()
 
         page_size = 20

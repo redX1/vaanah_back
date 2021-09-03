@@ -3,16 +3,18 @@ from django.db import models
 from cores.models import TimestampedModel
 import uuid
 
-class Carrier(TimestampedModel):
+class Address(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-# class Address(TimestampedModel):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     name = models.CharField(max_length=255)
-#     state = models.CharField(max_length=255)
-#     street1 = models.CharField(max_length=255)
-#     city = models.CharField(max_length=255)
-#     zip_code = models.CharField(max_length=255)
-#     country = models.CharField(max_length=255)
+    object_id = models.CharField(max_length=255, blank=True, default=None)
+    company = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    street1 = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    zip_code = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
 
 # class Parcel(TimestampedModel):
 #     parcel_length = models.IntegerField()

@@ -17,6 +17,9 @@ requests
 stripe
 django-storages
 boto3
+chatterbot-corpus==1.2.0
+requests
+shippo
 # ChatterBot==1.0.4
 # chatterbot-corpus==1.2.0
 

@@ -220,6 +220,7 @@ class MostViewedProductAPIView(APIView):
 
         serializer = ProductResponseSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
 class ProductReviewsAPIView(APIView):
     serializer_class = ProductReviewSerializer
 

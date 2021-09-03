@@ -9,6 +9,7 @@ class Category(TimestampedModel):
     name        = models.CharField(max_length=255)
     description = models.TextField() 
     slug        = models.SlugField()
+    views = models.IntegerField(default=0)
     parent      = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)

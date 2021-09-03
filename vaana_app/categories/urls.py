@@ -9,5 +9,6 @@ urlpatterns = [
     path('categories/<uuid:category_id>', views.CategoryUpdateDeleteAPIView.as_view()),
     path('categories/<uuid:category_id>/products', views.CategoryProductsAPIView.as_view(), name='products-category'),
     path('categories/latest', views.LatestCategoryAPIView.as_view()),
+    path('categories/most-viewed', views.MostViewedCategoryAPIView.as_view()),
 
 ]

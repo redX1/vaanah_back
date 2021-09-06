@@ -58,6 +58,7 @@ jobs:
         DB_PORT: ${{ matrix.db_port }}
         DB_PASSWORD: secretsecret
       run: |
+        cd vaana_app
         python manage.py test
 
   build-and-deploy:

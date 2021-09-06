@@ -16,14 +16,14 @@ jobs:
       matrix:
         python-version: [3.9]
         include:
-          - db: postgres
+          - db: release_0
             db_port: 5432
     # env:
     #   COMPOSE_FILE: docker-compose.yml
 
     services:
       postgres:
-        image: postgres:10
+        image: postgres:13
         env:
           POSTGRES_USER: vaanah_user
           POSTGRES_PASSWORD: secretsecret

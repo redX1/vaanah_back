@@ -21,19 +21,19 @@ jobs:
     # env:
     #   COMPOSE_FILE: docker-compose.yml
 
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: vaanah_user
-          POSTGRES_PASSWORD: secretsecret
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    # services:
+    #   postgres:
+    #     image: postgres:13
+    #     env:
+    #       POSTGRES_USER: vaanah_user
+    #       POSTGRES_PASSWORD: secretsecret
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    #     ports:
+    #       - 5432:5432
 
     steps:
     - name: Checkout code
@@ -54,6 +54,7 @@ jobs:
     - name: Run Tests
       env:
         DB: ${{ matrix.db }}
+        DB_USER: vaanah_user
         DB_HOST: vaanahdb.cvamgenajfwz.eu-central-1.rds.amazonaws.com
         DB_PORT: ${{ matrix.db_port }}
         DB_PASSWORD: secretsecret

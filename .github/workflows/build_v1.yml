@@ -59,6 +59,9 @@ jobs:
         DB_PASSWORD: secretsecret
       run: |
         cd vaana_app
+        python manage.py collectstatic --noinput
+        python manage.py makemigrations --noinput
+        python manage.py migrate --noinput
         python manage.py test
 
   build-and-deploy:

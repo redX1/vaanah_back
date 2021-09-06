@@ -68,7 +68,7 @@ jobs:
 # Coverage
     - name: Generate coverage report
       run: |
-        export DJANGO_SETTINGS_MODULE=vaana_app.vaana_app.settings
+        export DJANGO_SETTINGS_MODULE=vaana_app.settings
         pip install pytest
         pip install pytest-cov
         pytest --cov=./ --cov-report=xml

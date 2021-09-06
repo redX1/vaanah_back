@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'files',
     'funds',
     'wallets',
+    'vaana_app.settings'
 
     # 'chatterbot.ext.django_chatterbot',
 ]

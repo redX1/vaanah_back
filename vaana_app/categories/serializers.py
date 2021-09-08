@@ -8,6 +8,22 @@ class RecursiveField(serializers.Serializer):
         return serializer.data
 
 class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "parent",
+            "image",
+            "is_active",
+            "views",
+            "created_by",
+            "created_at",
+            "updated_at"
+        ]
+class CategoryResultSerializer(serializers.ModelSerializer):
     products = ProductResponseSerializer(many=True)
     children = RecursiveField(many=True,allow_null=True)
     class Meta:

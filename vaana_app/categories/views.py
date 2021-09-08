@@ -10,7 +10,7 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 
-from .serializers import CategorySerializer
+from .serializers import CategoryResultSerializer, CategorySerializer
 from .models import Category
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import permission_classes
@@ -22,7 +22,7 @@ from rest_framework.filters import SearchFilter
 from django.db.models import Count
 
 class CategorySearchAPIView(ListAPIView):
-    serializer_class = CategorySerializer
+    serializer_class = CategoryResultSerializer
     queryset  = Category.objects.all()
     filter_backends =  [SearchFilter,]
     search_fields = ['name', 'description']
@@ -35,7 +35,7 @@ class CategoryUpdateDeleteAPIView(RetrieveUpdateAPIView):
             category = Category.objects.get(id=category_id)
             category.views += 1
             category.save()
-            serializer = CategorySerializer(category)
+            serializer = CategoryResultSerializer(category)
             response = {
                 'body': serializer.data,
                 'status': status.HTTP_200_OK
@@ -68,7 +68,7 @@ class CategoryUpdateDeleteAPIView(RetrieveUpdateAPIView):
                     updated_at=now()
                     )
                 category = Category.objects.get(id=category_id)
-                serializer = CategorySerializer(category)
+                serializer = CategoryResultSerializer(category)
                 response['body'] = serializer.data
                 response['status'] = status.HTTP_200_OK
 
@@ -109,7 +109,7 @@ class CategoryAPIView(APIView):
         paginator.page_size = page_size        
         page = paginator.paginate_queryset(categories, request)
 
-        serializer = CategorySerializer(page, many=True)
+        serializer = CategoryResultSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
     @csrf_exempt
@@ -117,6 +117,8 @@ class CategoryAPIView(APIView):
     def post(self, request):
         payload = json.loads(request.body)
         user = request.user
+        serializer = CategorySerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
         response = {
             'body': {
                 'error':'Unauthorized action'
@@ -131,12 +133,12 @@ class CategoryAPIView(APIView):
                     slug=payload["slug"],
                     is_active= payload["is_active"],
                     description=payload["description"],
-                    #parent=Category.objects.get(name=payload['parent']),
+                    parent = Category.objects.get(id=payload['parent']) if 'parent' in payload else None,
                     image= payload['image'],
                     created_by=user
                 )
-                serializer = CategorySerializer(category)
-                response['body'] = serializer.data
+            
+                response['body'] = CategoryResultSerializer(category).data
                 response['status'] = status.HTTP_201_CREATED
                 
             except Exception as e:
@@ -154,7 +156,7 @@ class LatestCategoryAPIView(APIView):
         paginator.page_size = page_size        
         page = paginator.paginate_queryset(categories, request)
 
-        serializer = CategorySerializer(page, many=True)
+        serializer = CategoryResultSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
 class MostViewedCategoryAPIView(APIView):
@@ -166,7 +168,7 @@ class MostViewedCategoryAPIView(APIView):
         paginator.page_size = page_size        
         page = paginator.paginate_queryset(categories, request)
 
-        serializer = CategorySerializer(page, many=True)
+        serializer = CategoryResultSerializer(page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
 class CategoryProductsAPIView(APIView):

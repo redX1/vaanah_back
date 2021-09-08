@@ -15,7 +15,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import json
-
+ 
 from .models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -23,13 +23,13 @@ from cores.utils import send_email
 import jwt
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
-
+ 
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, ResetPasswordEmailRequestSerializer, SellerRegistrationSerializer, SetNewPasswordSerializer, UserSerializer, EmailVerificationSerializer
 )
-
-
+ 
+ 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.http import HttpResponsePermanentRedirect
@@ -40,7 +40,7 @@ from addresses.models import Address
 from rest_framework import filters
 from django.template.loader import get_template, render_to_string
 from django.shortcuts import render
-
+ 
 class UserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
@@ -57,7 +57,7 @@ class UserAPIView(APIView):
                 return JsonResponse({'error': str(e)}, safe=False, status=status.HTTP_404_NOT_FOUND)
         else:
             return JsonResponse({'error':'You are not a superuser !'}, status=status.HTTP_403_FORBIDDEN)
-
+ 
 class SingleUserAPIView(APIView):
     renderer_classes = (UserJSONRenderer,)
     permission_classes = (IsAuthenticated,)
@@ -71,16 +71,16 @@ class SingleUserAPIView(APIView):
             return JsonResponse({'user': serializer.data}, safe=False, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'error':'Forbidden !'}, status=status.HTTP_403_FORBIDDEN)
-
+ 
 class CustomRedirect(HttpResponsePermanentRedirect):
-
+ 
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
-
+ 
 class SellerRegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = SellerRegistrationSerializer
-
+ 
     @swagger_auto_schema(
         operation_description="apiview post description override",
         request_body=RegistrationSerializer,
@@ -89,7 +89,7 @@ class SellerRegistrationAPIView(APIView):
     )
     def post(self, request):
         user = request.data
-
+ 
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         user = User.objects.create_user(username=user['username'], email=user['email'], password=user['password'], account_type="Seller")
@@ -97,29 +97,29 @@ class SellerRegistrationAPIView(APIView):
         token = RefreshToken.for_user(user).access_token
         email = user.email
         absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email        
-
+ 
         context = {
             "username": user.username, 
             "email": email,
             "absurl": absurl
             }
         html_template = get_template( "email_verify.html").render(context)
-
+ 
         email_body = html_template 
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
-
+ 
         send_email(data)
-
+ 
         return Response(RegistrationSerializer(user).data, status=status.HTTP_201_CREATED)
-
+ 
 class RegistrationAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
     addressSerializer = AddressSerializer
-
+ 
     @swagger_auto_schema(
         operation_description="apiview post description override",
         request_body=RegistrationSerializer,
@@ -128,7 +128,7 @@ class RegistrationAPIView(APIView):
     )
     def post(self, request):
         user = request.data
-
+ 
         # The create serializer, validate serializer, save serializer pattern
         # below is common and you will see it a lot throughout this course and
         # your own work later on. Get familiar with it.
@@ -141,46 +141,46 @@ class RegistrationAPIView(APIView):
         addressSerializer.is_valid(raise_exception=True)
         serializer.data.address = addressSerializer.data
         serializer.save()
-
+ 
         user_data = serializer.data
         user = User.objects.get(email=user_data['email']) """
         token = RefreshToken.for_user(user).access_token
         email = user.email
         absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email        
-
+ 
         context = {
             "username": user.username, 
             "email": email,
             "absurl": absurl
             }
         html_template = get_template( "email_verify.html").render(context)
-
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
+ 
+        # current_site = get_current_site(request).domain
+        # relativeLink = reverse('email-verify')
         #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ "&email="+ email
         email_body = html_template #+'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
-
+ 
         send_email(data)
-
+ 
         return Response(RegistrationSerializer(user).data, status=status.HTTP_201_CREATED)
-
+ 
 class ResendEmailAPI(APIView):
     serializer_class = ResetPasswordEmailRequestSerializer
-
+ 
     def post (self, request):
         user = json.loads(request.body)
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-
+ 
         try:
             email = serializer.data['email']
             user = User.objects.get(email=email)
             token = RefreshToken.for_user(user).access_token
             current_site = get_current_site(request).domain
             relativeLink = reverse('email-resend')
-
+ 
             #absurl = 'http://'+current_site+relativeLink+"?token="+str(token)+ email
             absurl = settings.FRONT_URL + '/email/verify/'+"?token="+str(token)+ "&email="+email
             email_body = 'Hi '+user.username +' \nUse the link below to verify your email \n' + absurl
@@ -192,10 +192,10 @@ class ResendEmailAPI(APIView):
             return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception:
             return JsonResponse({'code': '500'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+ 
 class VerifyEmail(APIView):
     permission_classes = [AllowAny]
-
+ 
     def get(self, request):
         token = request.GET.get('token')
         #email = re
@@ -203,7 +203,7 @@ class VerifyEmail(APIView):
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
             user = User.objects.get(id=payload['user_id'])
             # print(payload['user'])
-
+ 
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
@@ -212,12 +212,12 @@ class VerifyEmail(APIView):
             return JsonResponse({'code': '400'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError as identifier:
             return JsonResponse({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-
+ 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
-
+ 
     @swagger_auto_schema(
         operation_description="apiview post description override",
         request_body=LoginSerializer,
@@ -226,17 +226,17 @@ class LoginAPIView(APIView):
     )
     def post(self, request):
         user = json.loads(request.body)
-
+ 
         # Notice here that we do not call `serializer.save()` like we did for
         # the registration endpoint. This is because we don't actually have
         # anything to save. Instead, the `validate` method on our serializer
         # handles everything we need.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-
+ 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+ 
+ 
 class BecomeSeller(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
@@ -244,11 +244,11 @@ class BecomeSeller(UpdateAPIView):
     
     def update(self, request, *args, **kwargs):
         user_data = json.loads(request.body)
-
+ 
         serializer_data = {
             'account_type': user_data.get('account_type', request.user.account_type),
         }
-
+ 
         # Here is that serialize, validate, save pattern we talked about
         # before.
         serializer = self.serializer_class(
@@ -256,15 +256,15 @@ class BecomeSeller(UpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
+ 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+ 
+ 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
-
+ 
     @swagger_auto_schema(
         operation_description="apiview post description override",
         security=[],
@@ -275,10 +275,10 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         # serializer to handle turning our `User` object into something that
         # can be JSONified and sent to the client.
         serializer = self.serializer_class(request.user)
-
+ 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+ 
+ 
     @swagger_auto_schema(
         operation_description="apiview post description override",
         request_body=UserSerializer,
@@ -287,14 +287,14 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     )    
     def update(self, request, *args, **kwargs):
         user_data = json.loads(request.body)
-
+ 
         serializer_data = {
             'username': user_data.get('username', request.user.username),
             'email': user_data.get('email', request.user.email),
             'account_type': user_data.get('account_type', request.user.account_type),
             'gender': user_data.get('gender', request.user.gender),
         }
-
+ 
         # Here is that serialize, validate, save pattern we talked about
         # before.
         serializer = self.serializer_class(
@@ -302,16 +302,16 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
+ 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+ 
+ 
 class RequestPasswordResetEmail(APIView):
     serializer_class = ResetPasswordEmailRequestSerializer
-
+ 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-
+ 
         email = request.data.get('email', '')
        
         if User.objects.filter(email=email).exists():
@@ -320,53 +320,59 @@ class RequestPasswordResetEmail(APIView):
             token = PasswordResetTokenGenerator().make_token(user)
             current_site = get_current_site(request=request).domain
             relativeLink = reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
-
+ 
             redirect_url = request.data.get('redirect_url', '')
             #absurl = 'http://'+current_site + relativeLink
-            absurl = settings.FRONT_URL + relativeLink
-            email_body = 'Hello, \nUse link below to reset your password  \n' + \
-                absurl+"?redirect_url="+redirect_url
+            absurl = settings.FRONT_URL + relativeLink + "?redirect_url="+redirect_url
+            context = {
+                "username": user.username, 
+                "email": email,
+                "absurl": absurl,
+                "redirect_url": redirect_url
+            }
+            html_template = get_template( "reset_password.html").render(context)
+            email_body = html_template
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Reset your passsword'}
             send_email(data)
             return Response({'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
         else:
             return Response({'Your are not a user please register !'}, status=status.HTTP_404_NOT_FOUND)
-
-
+ 
+ 
 class PasswordTokenCheckAPI(APIView):
     serializer_class = SetNewPasswordSerializer
-
+ 
     def get(self, request, uidb64, token):
-
+ 
         redirect_url = request.GET.get('redirect_url')
-
+ 
         try:
             id = smart_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id=id)
-
+ 
             if not PasswordResetTokenGenerator().check_token(user, token):
                 return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_400_BAD_REQUEST)
-
+ 
             return Response({'success': True, 'message': 'Credentials valid', 'uidb64': uidb64, 'token': token}, status=status.HTTP_200_OK)
         except DjangoUnicodeDecodeError as identifier:
             #if not PasswordResetTokenGenerator().check_token(user, token):
             return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
+ 
+ 
+ 
 class SetNewPasswordAPIView(APIView):
     serializer_class = SetNewPasswordSerializer
-
+ 
     def patch(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
-
-
+ 
+ 
 class UserStoreAPIView(APIView):
     serializer_class = StoreSerializer
-
+ 
     def get(self, request, user_id):
         stores = Store.objects.filter(created_by=user_id)
         serializer = StoreSerializer(stores, many=True)

@@ -39,6 +39,11 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# social auth keys
+SOCIAL_SECRET = ""
+GOOGLE_CLIENT_ID = "362829290794-l4bru0ev54gjl1ckpdfrokcdn1m0d3bd.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "tPyQnLTrvoxBYT4IOAYvYHWD"
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }

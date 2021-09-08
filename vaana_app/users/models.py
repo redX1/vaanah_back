@@ -58,6 +58,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
 
+    AUTH_PROVIDERS = {'facebook' : 'facebook', 'google' : 'google', 'email' : 'email'}
     M, F = (
         "M", "F"
     )
@@ -111,6 +112,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     gender = models.CharField(max_length=20, default='M')
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
 
+    auth_provider = models.CharField(max_length=255, blank=False, null=False, default=AUTH_PROVIDERS.get('email'))
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
     # In this case, we want that to be the email field.

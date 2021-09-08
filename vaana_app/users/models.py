@@ -59,6 +59,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
 
     AUTH_PROVIDERS = {'facebook' : 'facebook', 'google' : 'google', 'email' : 'email'}
+    
     M, F = (
         "M", "F"
     )

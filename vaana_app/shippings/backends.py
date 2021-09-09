@@ -65,3 +65,20 @@ class ShippoShipmentAPI(object):
             address_to=self.getAddressObjectForApi(shipment['address_to']),
             parcels=parcels
         )
+
+    def retrieve(self, id):
+        url = 'https://api.goshippo.com/shipments/'+id
+        headers = {
+            'Authorization': 'ShippoToken ' + settings.SHIPPO_API_KEY
+        }
+        return requests.get(url=url, headers=headers)
+
+    def all(self, page=None):
+        url = 'https://api.goshippo.com/shipments/'
+        params = {
+            'page': 1 if page is None else page
+        }
+        headers = {
+            'Authorization': 'ShippoToken ' + settings.SHIPPO_API_KEY
+        }
+        return requests.get(url=url, params=params, headers=headers)

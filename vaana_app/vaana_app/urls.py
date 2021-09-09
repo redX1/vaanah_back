@@ -62,6 +62,6 @@ urlpatterns = [
     
     # path('api/', include('chatbot.urls'), name='chatbot'),
 
-    path('api/shippings/', include('shippings.urls'), name='shippings'),
+    path('api/', include('shippings.urls'), name='shippings'),
 
 ]

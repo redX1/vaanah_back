@@ -28,9 +28,14 @@ def register_social_user(provider, user_id, email, name):
                 email=email, password=settings.SOCIAL_SECRET)
 
             return {
+                'id': registered_user.id,
                 'username': registered_user.username,
                 'email': registered_user.email,
-                'tokens': registered_user.tokens()}
+                'token': registered_user.token,
+                'gender': registered_user.gender,
+                'account_type': registered_user.account_type
+
+                }
 
         else:
             raise AuthenticationFailed(
@@ -48,7 +53,10 @@ def register_social_user(provider, user_id, email, name):
         new_user = authenticate(
             email=email, password=settings.SOCIAL_SECRET)
         return {
+            'id': new_user.id,
             'email': new_user.email,
             'username': new_user.username,
-            'token': new_user.token
+            'token': new_user.token,
+            'gender': new_user.gender,
+            'account_type': new_user.account_type
         }

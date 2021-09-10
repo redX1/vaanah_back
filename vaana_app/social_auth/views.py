@@ -1,10 +1,10 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from .serializers import GoogleSocialAuthSerializer, FacebookSocialAuthSerializer
 
 
-class GoogleSocialAuthView(GenericAPIView):
+class GoogleSocialAuthView(APIView):
 
     serializer_class = GoogleSocialAuthSerializer
 
@@ -20,7 +20,7 @@ class GoogleSocialAuthView(GenericAPIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class FacebookSocialAuthView(GenericAPIView):
+class FacebookSocialAuthView(APIView):
 
     serializer_class = FacebookSocialAuthSerializer
 

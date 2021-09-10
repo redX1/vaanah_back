@@ -40,9 +40,9 @@ EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # social auth keys
-SOCIAL_SECRET = ""
-GOOGLE_CLIENT_ID = "362829290794-l4bru0ev54gjl1ckpdfrokcdn1m0d3bd.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "tPyQnLTrvoxBYT4IOAYvYHWD"
+SOCIAL_SECRET = "vaanah"
+GOOGLE_CLIENT_ID = "362829290794-91601oi5pvqjoclq9u6eu7lvp04m620u.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "ThaLBrUPHNfNIQbPanEnayWU"
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
@@ -124,7 +124,7 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres6',
+        'NAME': 'postgres7',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',

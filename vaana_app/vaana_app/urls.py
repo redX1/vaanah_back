@@ -64,4 +64,7 @@ urlpatterns = [
 
     path('api/shippings/', include('shippings.urls'), name='shippings'),
 
+    path('api/', include('social_auth.urls'), name='social_auth'),
+
+
 ]

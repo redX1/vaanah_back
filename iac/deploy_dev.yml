@@ -77,7 +77,7 @@
 
     # - name: Kill Previous container
     #   shell: |
-    #     docker kill vaanah_test3
+    #     docker kill vaanah_google_login
     #   become: yes
 
     # - name: Prune container
@@ -91,10 +91,10 @@
 
     - name: Pull Backend app locally
       shell: |
-        docker pull papeterinnova/vaana-django:latest
+        docker pull papeterinnova/vaana-django:v1.5.0-google-login
       become: yes
 
     - name: Run Image
       shell: |
-        docker run -d -p 8082:8020 --name vaanah_google_login papeterinnova/vaana-django:latest
+        docker run -d -p 8082:8020 --name vaanah_google_login papeterinnova/vaana-django:v1.5.0-google-login
       become: yes

@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from .models import Parcel, Shipment, ShippingMethod, Address 
+from .models import Parcel, Shipment, ShippingMethod, Address, Transaction 
 
 
 class ShippoAddressSerializer(serializers.ModelSerializer):
@@ -80,6 +80,17 @@ class ShippoShipmentSerializer(serializers.ModelSerializer):
             shipment.parcels.add(self.createParcel(i))
         
         return ShippoShipmentSerializer(shipment).data
+
+class ShippoTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [
+            "id",
+            "object_id",
+            "shipment",
+            "carrier_account",
+            "servicelevel_token"
+        ]
 
 class ShippingMethodSerializer(serializers.ModelSerializer):
     class Meta:

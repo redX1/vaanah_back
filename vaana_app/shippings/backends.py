@@ -82,3 +82,40 @@ class ShippoShipmentAPI(object):
             'Authorization': 'ShippoToken ' + settings.SHIPPO_API_KEY
         }
         return requests.get(url=url, params=params, headers=headers)
+
+class ShippoTransactionAPI(object):
+    def create(self, transaction):
+        shippoShipmentApi = ShippoShipmentAPI()
+        shipment = transaction['shipment']
+        parcels = []
+        for i in shipment['parcels']:
+            parcels.append(shippoShipmentApi.getParcelObjectForApi(i))
+        address_from=shippoShipmentApi.getAddressObjectForApi(shipment['address_from'])
+        address_to=shippoShipmentApi.getAddressObjectForApi(shipment['address_to'])
+        return shippo.Transaction.create(
+            shipment={
+                'address_from': address_from,
+                'address_to': address_to,
+                'parcels': parcels
+            },
+            servicelevel_token=transaction['carrier_account'],
+            carrier_account=transaction['servicelevel_token'],
+            label_file_type='PDF'
+        )
+
+    def retrieve(self, id):
+        url = 'https://api.goshippo.com/transactions/'+id
+        headers = {
+            'Authorization': 'ShippoToken ' + settings.SHIPPO_API_KEY
+        }
+        return requests.get(url=url, headers=headers)
+
+    def all(self, page=None):
+        url = 'https://api.goshippo.com/transactions/'
+        params = {
+            'page': 1 if page is None else page
+        }
+        headers = {
+            'Authorization': 'ShippoToken ' + settings.SHIPPO_API_KEY
+        }
+        return requests.get(url=url, params=params, headers=headers)

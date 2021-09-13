@@ -91,10 +91,10 @@
 
     - name: Pull Backend app locally
       shell: |
-        docker pull papeterinnova/vaana-django:latest
+        docker pull papeterinnova/vaana-django:v1.5.1
       become: yes
 
     - name: Run Image
       shell: |
-        docker run -d -p 8081:8020 --name vaanah_new_server papeterinnova/vaana-django:latest
+        docker run -d -p 8081:8020 --name vaanah_new_server papeterinnova/vaana-django:v1.5.1
       become: yes

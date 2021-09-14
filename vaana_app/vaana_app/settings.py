@@ -39,6 +39,11 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# social auth keys
+SOCIAL_SECRET = "vaanah"
+GOOGLE_CLIENT_ID = "362829290794-91601oi5pvqjoclq9u6eu7lvp04m620u.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "ThaLBrUPHNfNIQbPanEnayWU"
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
@@ -123,7 +128,6 @@ DATABASES = {
         'USER': 'vaanah_user',
         'PASSWORD': 'secretsecret',
         'HOST': 'vaanahdb.cvamgenajfwz.eu-central-1.rds.amazonaws.com',
-        'PORT': '5432',
     }
 }
 

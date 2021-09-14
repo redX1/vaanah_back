@@ -6,5 +6,5 @@ urlpatterns = [
 
     path('carriers', views.ShippoCarrierAPIVIew.as_view()),
     path('shipments', views.ShippoShipmentAPIView.as_view()),
-
+    path('transactions', views.ShippoTransactionAPIView.as_view()),
 ]

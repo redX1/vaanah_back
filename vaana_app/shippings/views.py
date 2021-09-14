@@ -6,7 +6,7 @@ from rest_framework import serializers, status
 from rest_framework.views import APIView
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .backends import ShippoCarrierAPI, ShippoRatesAPI, ShippoShipmentAPI, ShippoTransactionAPI
+from .backends import ShippoCarrierAPI, ShippoRatesAPI, ShippoShipmentAPI, ShippoTransactionAPI, ShippoTrackingAPI
 from .serializers import ShippoShipmentSerializer, ShippoTransactionSerializer
 
 class ShippoCarrierAPIVIew(APIView):
@@ -140,6 +140,22 @@ class ShippoRatesAPIView(APIView):
 
         try:
             apiResponse = ratesApi.get_rates_for_shipment(shipment_object_id=shipment_object_id, page=page, currency=currency)
+            response = {
+                'body': apiResponse.json(),
+                'status': apiResponse.status_code
+            }
+        except Exception as e:
+            response = {
+                'body': str(e),
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return JsonResponse(response['body'], status=response['status'], safe=False)
+
+class ShippoTrackingAPIView(APIView):
+    def get(self, request, carrier, tracking_number):
+        trackingApi = ShippoTrackingAPI()
+        try:
+            apiResponse = trackingApi.get(carrier=carrier, tracking_number=tracking_number)
             response = {
                 'body': apiResponse.json(),
                 'status': apiResponse.status_code

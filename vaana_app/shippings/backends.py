@@ -119,3 +119,18 @@ class ShippoTransactionAPI(object):
             'Authorization': 'ShippoToken ' + settings.SHIPPO_API_KEY
         }
         return requests.get(url=url, params=params, headers=headers)
+
+class ShippoRatesAPI(object):
+    def get_rates_for_shipment(self, shipment_object_id, page=None, currency=None):
+        url = 'https://api.goshippo.com/shipments/' + shipment_object_id + '/rates/'
+        if currency is not None:
+            url += currency
+        params = {
+            'page': 1 if page is None else page,
+        }
+        headers = {
+            'Authorization': 'ShippoToken ' + settings.SHIPPO_API_KEY
+        }
+        return requests.get(url=url, params=params, headers=headers)
+
+        

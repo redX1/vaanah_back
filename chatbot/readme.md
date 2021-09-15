@@ -15,4 +15,7 @@ http://localhost:8080/api/bot?msg=[your message]
 
 http://localhost:8080/api/bot?msg='who are you ?'
 
-> > "I am a virtual agent."
+return:
+{
+message: "I am a virtual agent."
+}

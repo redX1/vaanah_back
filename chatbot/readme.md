@@ -7,10 +7,12 @@ docker run -tid -p 8080:8000 --name bot vaanah/chatbot:latest
 
 # URL API
 
-http://localhost:8080/bot?msg=[your message]
+Method: POST
+
+http://localhost:8080/api/bot?msg=[your message]
 
 ## Example
 
-http://localhost:8080/bot?msg='who are you ?'
+http://localhost:8080/api/bot?msg='who are you ?'
 
 > > "I am a virtual agent."

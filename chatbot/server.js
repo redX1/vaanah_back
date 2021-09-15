@@ -26,14 +26,14 @@ async function chatbot(findStr) {
   return response.answer;
 }
 
-app.get("/bot", (req, res) => {
+app.post("/api/bot", (req, res) => {
   res.set("Content-Type", "application/json");
 
   chatbot(req.query.msg).then(async (response) => {
     if (response == null) {
-      res.status(200).json("sorry I did not understand.");
+      res.status(200).json({ message: "sorry I did not understand." });
     } else {
-      res.status(200).json(response);
+      res.status(200).json({ message: response });
     }
   });
 });

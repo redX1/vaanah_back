@@ -66,5 +66,7 @@ urlpatterns = [
 
     path('api/', include('social_auth.urls'), name='social_auth'),
 
+    path('api/', include('newsletter.urls'), name='newsletter'),
+
 
 ]

@@ -1,0 +1,175 @@
+{
+    "name": "Donnee d'entree",
+    "locale": "en-US",
+    "data": [
+      {
+        "intent": "my.name",
+        "utterances": [
+          "What is your you name details ?",
+          "How shall I call you ?",
+          "What is your you name ?"
+        ],
+        "answers": [
+          { "answer": "You can call me Sam" },
+          { "answer": "I prefer to be called Phil"}
+        ]
+      },
+      {
+        "intent": "my.me",
+        "utterances": [
+          "Who are you ?"
+        ],
+        "answers": [
+          { "answer": "I am your vaanah assistant."},
+          { "answer": "I am a virtual agent." }
+        ]
+      },
+      {
+        "intent": "my.song",
+        "utterances": [
+          "play music"
+        ],
+        "answers": [
+          { "answer": "<a href='https://www.insider.com/best-life-changing-songs-2017-4' target='_blanck'>Here</a> is a list.<br>These can be easily found on <a href='https://www.youtube.com/' target='_blanck'>youtube</a>."},
+          { "answer": "Although, <a href='https://www.youtube.com/watch?v=JGwWNGJdvx8' target='_blanck'>this</a> song is old, but old is Gold! This song is a beauty :)" }
+   
+        ]
+      },
+      {
+        "intent": "greetings.bye",
+        "utterances": [
+          "goodbye for now",
+          "bye bye take care",
+          "okay see you later",
+          "bye for now",
+          "i must go",
+          "bye"
+        ],
+        "answers": [
+          { "answer": "Till next time" },
+          { "answer": "see you soon!"}
+        ]
+      },
+      {
+        "intent": "user.redirect",
+        "utterances": [
+          "Can I talk to a real human?",
+          "Please connect me to a living person",
+          "Please redirect me to an employee",
+          "Can I talk to someone human?",
+          "Can I see a human operator please?",
+          "I want to enter the live chat",
+          "I hate chatbots actually so please could you get out of my screen and connect me to someone made from flesh thanks"
+        ],
+        "answers": [
+          { "answer": "Yes of course" }
+  
+        ]
+      },
+      {
+        "intent": "user.help",
+        "utterances": [
+          "start",
+          "help",
+          "vaanah details",
+          "vaanah"
+        ],
+        "answers": [
+          { "answer": "What can i do for you ?" }
+        ]
+      },
+      {
+        "intent": "user.thanking",
+        "utterances": [
+          "thanks",
+          "thank you",
+          "thanks a billion",
+          "thx",
+          "grateful"
+        ],
+        "answers": [
+          { "answer": "your welcome"}
+        ]
+      },
+      {
+        "intent": "user.pricing",
+        "utterances": [
+          "Can I see the prices?",
+          "What's the pricing?",
+          "How much is it?",
+          "How much do I have to pay?"
+        ],
+        "answers": [
+          { "answer": "Check out our pricing by the link:\nhttps://stormotion.io/"}
+        ]
+      },
+      {
+        "intent": "greetings.hello",
+        "utterances": [
+          "hello eddy",
+          "hi",
+          "howdy",
+          "hey",
+          "greetings",
+          "hey there",
+          "hola",
+          "What's up?"
+        ],
+        "answers": [
+          { "answer": "Hey there" },
+          { "answer": "Greetings!"}
+        ]
+      },
+      {
+        "intent": "user.email",
+        "utterances": [
+          "something@somehost.com",
+          "My email is %email% please write me",
+          "My email is %email%"
+          
+        ],
+        "answers": [
+          { "answer": "thanks you for your registration  :  {{email}} "}
+        ]
+       
+      },
+      {
+        "intent": "user.registerNewsletter",
+        "utterances": [
+          "register newsletter",
+          "newsletter",
+          "send me your newsletter",
+          "how can i receive your newsletter ?"
+        ],
+        "answers": [
+          { "answer": "For receive our notification, please What is your email ?"} 
+        ]
+       
+      },
+      {
+        "intent": "user.book",
+        "utterances": [
+          "I'd like to book an appointment",
+          "I wanna see the doc",
+          "Can I see the doctor?",
+          "When is the doctor available?",
+          "I want some help with my knee",
+          "I want to see @doctor",
+          "I'd like to visit @doctor",
+          "Is @doctor available?",
+          "another reservation pls"
+        ]
+      }
+    ],
+    "entities": {
+      "doctor": {
+        "options": {
+          "christine": ["Christine", "Christie", "Christine Collins", "The woman with black hair", "the female doctor"],
+          "josh": ["Josh", "Joshua", "Josh Stammer", "The main with glasses"],
+          "abraham": ["Abraham", "Abraham Brown", "Abe", "The man with brown curly hair"]
+        }
+      },
+      "email":{ "email": ["something@somehost.com"] },
+      "Person":{ "Person":  ["eddy noukap"] }
+    }
+  }

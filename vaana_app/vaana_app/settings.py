@@ -80,6 +80,8 @@ INSTALLED_APPS = [
     'funds',
     'wallets',
 
+    'newsletter',
+
     # 'chatterbot.ext.django_chatterbot',
 ]
 

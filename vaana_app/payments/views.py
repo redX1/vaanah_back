@@ -1,9 +1,12 @@
+from braintree.error_result import ErrorResult
+from braintree.successful_result import SuccessfulResult
+from .backends import BraintreeAPI
 from .models import PaymentModel
 from django.core.exceptions import ObjectDoesNotExist
 from stripe.api_resources import line_item
 from orders.models import Order, OrderItem
 from orders.serializers import OrderDetailsSerializer
-from .serializers import PaymentSerializer, StripePaymentIntentConfirmSerializer
+from .serializers import BraintreeTransactionSerializer, PaymentSerializer, StripePaymentIntentConfirmSerializer
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -134,5 +137,58 @@ class ConfirmStripePayment(RetrieveUpdateAPIView):
                     'error': str(e)
                 },
                 'status': status.HTTP_403_FORBIDDEN            
+            }
+        return JsonResponse(response['body'], status = response['status'], safe=False)
+
+
+class BraintreeAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            braintreeApi = BraintreeAPI()
+            response = {
+                'body': {
+                    'client_token': braintreeApi.get_client_token()
+                },
+                'status': status.HTTP_200_OK
+            }
+        except Exception as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR            
+            }
+        return JsonResponse(response['body'], status = response['status'], safe=False)
+
+    def post(self, request, *args, **kwargs):
+        #user = request.user
+        payload = json.loads(request.body)
+        serializer = BraintreeTransactionSerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+           braintreeApi = BraintreeAPI()
+           apiResponse = braintreeApi.transaction_sale(payload)
+           if isinstance(apiResponse, ErrorResult):
+               response = {
+                   'body': {
+                        'error': apiResponse.message
+                    },
+                    'status': status.HTTP_400_BAD_REQUEST
+                }
+           elif isinstance(apiResponse, SuccessfulResult):
+               
+               response = {
+                    'body': {
+                        'data': braintreeApi.getTransactionObject(apiResponse.transaction)
+                    },
+                    'status': status.HTTP_201_CREATED
+                }
+        except Exception as e:
+            response = {
+                'body': {
+                    'error': str(e)
+                },
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR          
             }
         return JsonResponse(response['body'], status = response['status'], safe=False)

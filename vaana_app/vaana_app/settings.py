@@ -124,7 +124,7 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'deval_test',
         'USER': 'vaanah_user',
         'PASSWORD': 'secretsecret',
         'HOST': 'vaanahdb.cvamgenajfwz.eu-central-1.rds.amazonaws.com',
@@ -210,3 +210,7 @@ AWS_S3_REGION_NAME = 'eu-central-1'
 AWS_LOCATION = 'static'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+BRAINTREE_MERCHANT_ID = 'w9j366qh6jprqfqz'
+BRAINTREE_PUBLIC_KEY = 'r9zcny82gsp4byhn'
+BRAINTREE_PRIVATE_KEY = '8c28b845a74b8cb21435a4adf0949f49'
+

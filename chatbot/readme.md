@@ -12,13 +12,14 @@ Method: POST
 http://localhost:8080/api/bot
 
 Request body raw:
-{
-msg: "Who are you ?"
-}
 
 ## Example
 
-http://localhost:8080/api/bot?msg='who are you ?'
+POST
+http://localhost:8080/api/bot
+{
+msg: "Who are you ?"
+}
 
 return:
 {

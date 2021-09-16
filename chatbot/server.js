@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 const port = process.env.PORT || 8000;
 
@@ -29,7 +30,7 @@ async function chatbot(findStr) {
 app.post("/api/bot", (req, res) => {
   res.set("Content-Type", "application/json");
 
-  chatbot(req.query.msg).then(async (response) => {
+  chatbot(req.body.msg).then(async (response) => {
     if (response == null) {
       res.status(200).json({ message: "sorry I did not understand." });
     } else {

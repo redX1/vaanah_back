@@ -9,7 +9,12 @@ docker run -tid -p 8080:8000 --name bot vaanah/chatbot:latest
 
 Method: POST
 
-http://localhost:8080/api/bot?msg=[your message]
+http://localhost:8080/api/bot
+
+Request body raw:
+{
+msg: "Who are you ?"
+}
 
 ## Example
 

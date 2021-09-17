@@ -3,7 +3,7 @@ name: CICD Vaanah-Backend
 on:
   push:
     branches:
-      - main
+      - feature/vaana-853
 
 jobs:
 # Test application Image

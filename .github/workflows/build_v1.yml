@@ -1,9 +1,10 @@
 name: CICD Vaanah-Backend
 
+
 on:
   push:
     branches:
-      - feature/vaana-853
+      - main
 
 jobs:
 # Test application Image

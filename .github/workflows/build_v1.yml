@@ -11,46 +11,15 @@ jobs:
 #    needs: build-and-push
     name: Vaanah Integration and Unit Test
     runs-on: ubuntu-latest
-    strategy:
-#      max-parallel: 4
-      matrix:
-        python-version: [3.9]
-        include:
-          - db: release_0
-            db_port: 5432
-    # env:
-    #   COMPOSE_FILE: docker-compose.yml
+    env:
+      COMPOSE_FILE: docker-compose.yml
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install Dependencies
-      run: |
-        cd vaana_app
-        python -m pip install --upgrade pip
-        pip install coverage
-        pip install -r requirements.txt
-        pip install -r test-requirements.txt
-    
-    - name: Run Tests
-      env:
-        DB: ${{ matrix.db }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ matrix.db_port }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      run: |
-        cd vaana_app
-        python manage.py collectstatic --noinput
-        python manage.py makemigrations --noinput
-        python manage.py migrate --noinput
-        python manage.py test
+    - name: Run tests
+      run: docker-compose run vaanah-test
 
   build-and-deploy:
     needs: test
@@ -101,7 +70,7 @@ jobs:
         file: ./Dockerfile.django
         builder: ${{ steps.buildx.outputs.name }}
         push: true
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vaana-django:v1.5.0-google-login
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vaana-django:v1.5.2
         # cache-from: type=local,src=/tmp/.buildx-cache
         # cache-to: type=local,dest=/tmp/.buildx-cache
 

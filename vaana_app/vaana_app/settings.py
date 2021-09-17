@@ -126,7 +126,7 @@ WSGI_APPLICATION = 'vaana_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'deval_test',
         'USER': 'vaanah_user',
         'PASSWORD': 'secretsecret',
         'HOST': 'vaanahdb.cvamgenajfwz.eu-central-1.rds.amazonaws.com',
@@ -200,7 +200,7 @@ APPEND_SLASH=False
 # called `INSTALLED_APPS`.
 AUTH_USER_MODEL = 'users.User'
 
-FRONT_URL = 'http://ec2-18-193-203-105.eu-central-1.compute.amazonaws.com:8084'
+FRONT_URL = 'http://af0c05818326248cfb304153367460b2-1279355103.eu-central-1.elb.amazonaws.com/'
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51HQ3ZXFunRLoLWctiy0l6VVOeflU8ES2IRjTyY7LL9rEpKedBIfOfKB1BSSftQk4Qmke8HdtRcdmje7R2whuWgTz00U7HXpwjn'
 STRIPE_SECRET_KEY = 'sk_test_51HQ3ZXFunRLoLWctxxpIKhYLudKWPCFsLPQzDgKoR1UZykOkD8CIDkxT2GUrXC5aejGMQkTReqSrOCGGF6sUUBQo00Sz4ugrOQ'
 SHIPPO_API_KEY = 'shippo_test_d88dfb2c748b3c9ea2483bded12428024b5f36e3'
@@ -212,3 +212,7 @@ AWS_S3_REGION_NAME = 'eu-central-1'
 AWS_LOCATION = 'static'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+BRAINTREE_MERCHANT_ID = 'w9j366qh6jprqfqz'
+BRAINTREE_PUBLIC_KEY = 'r9zcny82gsp4byhn'
+BRAINTREE_PRIVATE_KEY = '8c28b845a74b8cb21435a4adf0949f49'
+

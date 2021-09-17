@@ -1,5 +1,10 @@
 import braintree
 from django.conf import settings
+from .models import PaymentModel
+from cores.utils import *
+from funds.backends import FundController
+from wallets.backends import WalletController
+from orders.models import Order, OrderItem
 
 gateway = braintree.BraintreeGateway(
     braintree.Configuration(
@@ -41,3 +46,42 @@ class BraintreeAPI(object):
             'settlement_batch_id': transaction.settlement_batch_id,
             'status': transaction.status,
         }
+
+class PaymentBackend(object):
+    def create(self, data):
+        return PaymentModel.objects.create(
+            order_number=data['order_number'],
+            method=data['method'],
+            amount=data['amount'],
+            currency=data['currency'],
+            status=data['status'] if 'status' in data else PaymentModel.OPEN
+        )
+    
+    def updateOrderItemStatus(self, order, status, payment_intent_id):
+        items = OrderItem.objects.filter(order=order)
+        for item in items:
+            item.payment_intent_id = payment_intent_id
+            item.status = status
+            item.save()
+
+    def updateProductsQuantity(self, cart, payment, payment_intent_id):
+        for item in cart.items.all():
+            try:
+                product = item.product
+                product.quantity = product.quantity - item.quantity
+                product.save()
+                wallet = WalletController().get(product.created_by)
+                FundController().create((product.price * item.quantity), 'EUR', cart.owner, payment, wallet, payment_intent_id, product)
+                email_data = {
+                    'email_body': str(item.quantity) + ' of your  product ' + product.name + ' have been ordered',
+                    'to_email': product.created_by.email,
+                    'email_subject': 'Product ordered'
+                    }
+                send_email(email_data)
+            except Exception as e:
+                print(str(e))
+                pass
+
+    def sendOrderConfirmation(self, order, user):
+        email_data = {'email_body': 'Your order ' + order.number + ' has been confirmed.', 'to_email': user.email, 'email_subject': 'Order confirmed'}
+        send_email(email_data)

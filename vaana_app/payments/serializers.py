@@ -29,13 +29,13 @@ class StripePaymentIntentConfirmSerializer(serializers.Serializer):
         }
 
 class BraintreeTransactionSerializer(serializers.Serializer):
-    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
     nonce = serializers.CharField(max_length=255)
     device_data = serializers.CharField(max_length=255, required=False, default=None)
+    payment = PaymentSerializer()
 
     class Meta:
         fields = [
-            "amount",
             "nonce",
-            "device_data"
+            "device_data",
+            "payment"
         ]

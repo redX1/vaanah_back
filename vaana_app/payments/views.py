@@ -1,6 +1,6 @@
 from braintree.error_result import ErrorResult
 from braintree.successful_result import SuccessfulResult
-from .backends import BraintreeAPI
+from .backends import BraintreeAPI, PaymentBackend
 from .models import PaymentModel
 from django.core.exceptions import ObjectDoesNotExist
 from stripe.api_resources import line_item
@@ -25,25 +25,6 @@ from funds.backends import FundController
 from wallets.backends import WalletController
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-
-def updateProductsQuantity(cart, payment, payment_intent_id):
-    
-    for item in cart.items.all():
-        try:
-            product = item.product
-            product.quantity = product.quantity - item.quantity
-            product.save()
-            wallet = WalletController().get(product.created_by)
-            FundController().create((product.price * item.quantity), 'EUR', cart.owner, payment, wallet, payment_intent_id, product)
-            email_data = {
-                'email_body': str(item.quantity) + ' of your  product ' + product.name + ' have been ordered',
-                'to_email': product.created_by.email,
-                'email_subject': 'Product ordered'
-                }
-            send_email(email_data)
-        except Exception as e:
-            print(str(e))
-            pass
 
 class InitiateStripePayement(APIView):
     @csrf_exempt
@@ -88,13 +69,7 @@ class InitiateStripePayement(APIView):
         return JsonResponse(response['body'], status = response['status'], safe=False)
 
 class ConfirmStripePayment(RetrieveUpdateAPIView):
-    def updateOrderItemStatus(self, order, status, payment_intent_id):
-        items = OrderItem.objects.filter(order=order)
-        for item in items:
-            item.payment_intent_id = payment_intent_id
-            item.status = status
-            item.save()
-
+    
     @csrf_exempt
     @permission_classes([IsAuthenticated])
     def update(self, request,payment_intent_id):
@@ -114,17 +89,16 @@ class ConfirmStripePayment(RetrieveUpdateAPIView):
 
             if intent['status'] == 'succeeded' and intent['metadata']['order_number'] == payload['order_number']:
                 try:
+                    paymentBackend = PaymentBackend()
                     order = Order.objects.get(number=payload['order_number'], user=user)
                     payment = PaymentModel.objects.get(order_number=payload['order_number'])
                     order.status = Order.CONFIRMED
                     order.save()
                     payment.status = PaymentModel.DONE
                     payment.save()
-                    email_data = {'email_body': 'Your order ' + order.number + ' has been confirmed.', 'to_email': user.email,
-                'email_subject': 'Order confirmed'}
-                    send_email(email_data)
-                    updateProductsQuantity(order.cart, payment, payment_intent_id)
-                    self.updateOrderItemStatus(order, Order.CONFIRMED, payment_intent_id)
+                    paymentBackend.sendOrderConfirmation(order=order, user=user)
+                    paymentBackend.updateProductsQuantity(cart=order.cart, payment=payment, payment_intent_id=payment_intent_id)
+                    paymentBackend.updateOrderItemStatus(order=order, status=Order.CONFIRMED, payment_intent_id=payment_intent_id)
                     response['body'] = OrderDetailsSerializer(order).data
                     response['status'] = status.HTTP_200_OK
                 except ObjectDoesNotExist:
@@ -161,10 +135,12 @@ class BraintreeAPIView(APIView):
         return JsonResponse(response['body'], status = response['status'], safe=False)
 
     def post(self, request, *args, **kwargs):
-        #user = request.user
+        user = request.user
         payload = json.loads(request.body)
         serializer = BraintreeTransactionSerializer(data=payload)
         serializer.is_valid(raise_exception=True)
+        paymentSerializer = PaymentSerializer(data=serializer.data['payment'])
+        paymentSerializer.is_valid(raise_exception=True)
 
         try:
            braintreeApi = BraintreeAPI()
@@ -177,10 +153,19 @@ class BraintreeAPIView(APIView):
                     'status': status.HTTP_400_BAD_REQUEST
                 }
            elif isinstance(apiResponse, SuccessfulResult):
-               
+               paymentBackend = PaymentBackend()
+               transaction = braintreeApi.getTransactionObject(apiResponse.transaction)
+               data = paymentSerializer.data
+               data['method'] = 'braintree_paypal'
+               data['status'] = PaymentModel.DONE
+               payment = paymentBackend.create(data=data)
+               order = Order.objects.get(number=data['order_number'], user=user)
+               paymentBackend.sendOrderConfirmation(order=order, user=user)
+               paymentBackend.updateProductsQuantity(cart=order.cart, payment=payment, payment_intent_id=transaction['id'])
+               paymentBackend.updateOrderItemStatus(order=order, status=Order.CONFIRMED, payment_intent_id=transaction['id'])
                response = {
                     'body': {
-                        'data': braintreeApi.getTransactionObject(apiResponse.transaction)
+                        'data': transaction
                     },
                     'status': status.HTTP_201_CREATED
                 }

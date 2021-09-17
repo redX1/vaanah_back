@@ -96,9 +96,5 @@
 
     - name: Run Image
       shell: |
-<<<<<<< HEAD
-        docker run -d -p 8082:8020 --name vaanah_google_login papeterinnova/vaana-django:v1.5.0-google-login
-=======
         docker run -d -p 8081:8020 --name vaanah_test2 papeterinnova/vaana-django:v1.5.2
->>>>>>> develop
       become: yes

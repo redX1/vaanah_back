@@ -77,7 +77,7 @@
 
     - name: Kill Previous container
       shell: |
-        docker kill vaanah_test2
+        docker kill vaanah_test3
       become: yes
 
     - name: Prune container

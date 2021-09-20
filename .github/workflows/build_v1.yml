@@ -9,6 +9,9 @@ on:
 
 jobs:
   analyze:
+    permissions:
+      security-events: write
+      actions: read
     name: Analyze
     runs-on: ubuntu-latest
     strategy:

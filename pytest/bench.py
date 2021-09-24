@@ -10,5 +10,5 @@ def test_fib_20(benchmark):
     benchmark(fib, 20)
 
 
-def test_fib_60(benchmark):
-    benchmark(fib, 60)
+def test_fib_30(benchmark):
+    benchmark(fib, 30)

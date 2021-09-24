@@ -22,6 +22,7 @@ jobs:
         with:
           name: Python Benchmark with pytest-benchmark
           tool: "pytest"
+          gh-pages-branch: test/perform
           output-file-path: pytest/output.json
           # Use personal access token instead of GITHUB_TOKEN due to https://github.community/t5/GitHub-Actions/Github-action-not-triggering-gh-pages-upon-push/td-p/26869/highlight/false
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}

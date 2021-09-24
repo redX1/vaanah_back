@@ -1,8 +1,8 @@
 
 from fib import fib
-from vaana_app.categories.tests.test_views import CategoryTest
-from vaana_app.products.models import Product
-from vaana_app.users.models import UserManager
+from ..vaana_app.categories.tests.test_views import CategoryTest
+from ..vaana_app.products.models import Product
+from ..vaana_app.users.models import UserManager
 import pytest
 
 

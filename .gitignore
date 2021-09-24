@@ -1,1 +1,5 @@
 chatbot/node_modules
+/pytest/venv
+/pytest/__pycache__
+/pytest/.benchmarks
+/pytest/.pytest_cache

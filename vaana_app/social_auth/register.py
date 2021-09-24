@@ -1,4 +1,6 @@
 
+from addresses.models import Address
+import json
 from users.models import User
 from django.contrib.auth import authenticate
 import os
@@ -33,7 +35,8 @@ def register_social_user(provider, user_id, email, name):
                 'email': registered_user.email,
                 'token': registered_user.token,
                 'gender': registered_user.gender,
-                'account_type': registered_user.account_type
+                'account_type': registered_user.account_type,
+                'address': registered_user.address.id,
 
                 }
 
@@ -42,9 +45,22 @@ def register_social_user(provider, user_id, email, name):
                 detail='Please continue your login using ' + filtered_user_by_email[0].auth_provider)
 
     else:
+        add = {
+            "country": "to be change",
+            "state": "to be change",
+            "street": "to be change",
+            "zipcode": "to be change"
+        }
+        address = Address.objects.create(**add)
+        print("add",add)
+        print("address",address)
+
         user = {
-            'username': generate_username(name), 'email': email,
-            'password': settings.SOCIAL_SECRET}
+            'username': generate_username(name), 
+            'email': email,
+            'password': settings.SOCIAL_SECRET,
+            'address' : address
+        }
         user = User.objects.create_user(**user)
         user.is_verified = True
         user.auth_provider = provider
@@ -58,5 +74,6 @@ def register_social_user(provider, user_id, email, name):
             'username': new_user.username,
             'token': new_user.token,
             'gender': new_user.gender,
-            'account_type': new_user.account_type
+            'account_type': new_user.account_type,
+            'address': new_user.address.id,
         }

@@ -22,17 +22,20 @@ jobs:
         with:
           name: Python Benchmark with pytest-benchmark
           tool: "pytest"
-          gh-pages-branch: test/perform
-          benchmark-data-dir-path: docs/dev/bench
+          #gh-pages-branch: test/perform
+          #benchmark-data-dir-path: docs/dev/bench
           output-file-path: pytest/output.json
           # Use personal access token instead of GITHUB_TOKEN due to https://github.community/t5/GitHub-Actions/Github-action-not-triggering-gh-pages-upon-push/td-p/26869/highlight/false
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          auto-push: true
+          auto-push: false
+          # Push gh-pages branch by yourself
           # Show alert with commit comment on detecting possible performance regression
           alert-threshold: "200%"
           comment-on-alert: true
           fail-on-alert: true
           alert-comment-cc-users: "@redX1"
+      - name: Push benchmark result
+          run: git push 'https://redX1:${{ secrets.PERSONAL_GITHUB_TOKEN }}@github.com/redX1/vaanah_back.git' gh-pages:gh-pages
   # Test application Image
   # test:
   #   #    needs: build-and-push

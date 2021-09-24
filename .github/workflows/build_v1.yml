@@ -35,7 +35,7 @@ jobs:
           fail-on-alert: true
           alert-comment-cc-users: "@redX1"
       - name: Push benchmark result
-          run: git push 'https://redX1:${{ secrets.PERSONAL_GITHUB_TOKEN }}@github.com/redX1/vaanah_back.git' gh-pages:gh-pages
+        run: git push 'https://redX1:${{ secrets.PERSONAL_GITHUB_TOKEN }}@github.com/redX1/vaanah_back.git' gh-pages:gh-pages
   # Test application Image
   # test:
   #   #    needs: build-and-push
